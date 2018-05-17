@@ -20,7 +20,7 @@ class ConceptTree extends React.Component {
     componentDidMount() {
         this.initThree();
         this.indexStack = [0];
-        this.meshes = [];
+        this.meshes = [0];
         this.textLoader = new THREE.FontLoader();
         this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
             this.font = font;
@@ -90,8 +90,9 @@ class ConceptTree extends React.Component {
 
         // calculate objects intersecting the picking ray
         let intersects = this.raycaster.intersectObjects( this.scene.children );
-        if (intersects.length > 0 && intersects[0].object.name !== undefined) {
+        if (intersects.length > 0 && intersects[0].object.name !== undefined && intersects[0].object.name >= 0) {
             this.indexStack.push(intersects[0].object.name);
+            console.log(this.indexStack)
             this.initNodes();
         }
     }
@@ -113,45 +114,53 @@ class ConceptTree extends React.Component {
             { x: -500, y: 0, z: 0, offsetX: 1, offsetZ: 0, },
         ];
         let rotationYs = [0, -Math.PI / 2, Math.PI, -Math.PI / 2,];
+        let stepCount = this.indexStack.length;
         this.indexStack.forEach((index, stepIdx) => {
+            cursor = cursor.children[index];
+            console.log('cursor', cursor)
             if (cursor.children && cursor.children.length > 0) {
                 let childrenCount = cursor.children.length;
                 let totalHeight = 60 * childrenCount;
-                cursor.children.forEach((item, idx) => {
-                    if (this.meshes[depth + '-' + idx] === undefined) {
-                        let textGeo = new THREE.TextGeometry(item.name, {
-                            font: this.font,
-                            size: 40,
-                            height: 20,
-                            curveSegments: 4,
-                            bevelThickness: 2,
-                            bevelSize: 1.5,
-                            bevelEnabled: true,
-                        });
-                        textGeo = new THREE.BufferGeometry().fromGeometry(textGeo);
-                        textGeo.computeBoundingBox();
-                        textGeo.computeVertexNormals();
-                        // let boundingGeo = new THREE.CubeGeometry(textGeo.boundingBox.max.x - textGeo.boundingBox.min.x,
-                        //     40, 20);
-                        // let boundingMesh = new THREE.Mesh(boundingGeo, new THREE.MeshBasicMaterial());
-                        let centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-                        let textMesh = new THREE.Mesh(textGeo, this.textMaterial);
-                        textMesh.position.x = positions[stepIdx].x + centerOffset * positions[stepIdx].offsetX;
-                        textMesh.position.y = -totalHeight / 2 + idx * 60;
-                        textMesh.position.z = positions[stepIdx].z + centerOffset * positions[stepIdx].offsetZ;
-                        textMesh.rotation.y = rotationYs[stepIdx];
-                        textMesh.name = idx;
-                        this.scene.add(textMesh);
-                        // this.scene.add(boundingMesh);
-                        this.meshes[depth + '-' + idx] = textMesh;
-                    }
-                });
-                cursor = cursor.children[index];
+                if (stepIdx >= stepCount - 4) {
+                    cursor.children.forEach((item, idx) => {
+                        this.addTextMesh(depth, idx, item, positions, stepIdx, totalHeight, rotationYs);
+                    });
+                }
             }
             depth++;
         });
         console.log(this.meshes);
         this.panTo(-(this.indexStack.length - 1) * Math.PI / 2);
+    }
+
+    addTextMesh(depth, idx, item, positions, stepIdx, totalHeight, rotationYs) {
+        if (this.meshes[depth + '-' + idx] === undefined) {
+            let textGeo = new THREE.TextGeometry(item.name, {
+                font: this.font,
+                size: 40,
+                height: 20,
+                curveSegments: 4,
+                bevelThickness: 2,
+                bevelSize: 1.5,
+                bevelEnabled: true,
+            });
+            textGeo = new THREE.BufferGeometry().fromGeometry(textGeo);
+            textGeo.computeBoundingBox();
+            textGeo.computeVertexNormals();
+            // let boundingGeo = new THREE.CubeGeometry(textGeo.boundingBox.max.x - textGeo.boundingBox.min.x,
+            //     40, 20);
+            // let boundingMesh = new THREE.Mesh(boundingGeo, new THREE.MeshBasicMaterial());
+            let centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            let textMesh = new THREE.Mesh(textGeo, this.textMaterial);
+            textMesh.position.x = positions[stepIdx].x + centerOffset * positions[stepIdx].offsetX;
+            textMesh.position.y = -totalHeight / 2 + idx * 60;
+            textMesh.position.z = positions[stepIdx].z + centerOffset * positions[stepIdx].offsetZ;
+            textMesh.rotation.y = rotationYs[stepIdx];
+            textMesh.name = item.children.length > 0 ? idx : -1;
+            this.scene.add(textMesh);
+            // this.scene.add(boundingMesh);
+            this.meshes[depth + '-' + idx] = textMesh;
+        }
     }
 
     onMousemove(event) {
@@ -164,6 +173,7 @@ class ConceptTree extends React.Component {
         let intersects = this.raycaster.intersectObjects( this.scene.children );
         if (intersects.length > 0 && intersects[0].object.name !== undefined) {
             if (this.INTERSECTED !== intersects[0].object) {
+                console.log(intersects);
                 if (this.INTERSECTED) {
                     this.INTERSECTED.material = this.textMaterial;
                 }
