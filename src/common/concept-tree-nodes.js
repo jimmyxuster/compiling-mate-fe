@@ -1,9 +1,9 @@
 export default {
     children: [{
-        name: '编译器',
+        name: 'Compilers',
         children: [
             {
-                name: '词法分析',
+                name: 'Lexical Analysis',
                 children: [
                     {
                         name: 'RE to NFA',
@@ -20,7 +20,7 @@ export default {
                 ]
             },
             {
-                name: '语法分析',
+                name: 'Syntax Analysis',
                 children: [
                     {
                         name: 'LL(1)',

@@ -1,5 +1,5 @@
 @import "../../common/consts.scss";
-.concept-tree__wrapper {
-  height: 100%;
-  padding-top: $title-bar-height;
+.concept-three__wrapper {
+  height: calc(100% - 56px);
+  overflow: hidden;
 }

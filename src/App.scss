@@ -1,5 +1,11 @@
+@import "./common/consts.scss";
 .App {
   text-align: center;
+  height: 100%;
+}
+
+.title {
+  height: $title-bar-height;
 }
 
 .App-logo {

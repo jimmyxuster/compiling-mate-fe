@@ -1,74 +1,205 @@
 import React from 'react';
-import THREE from '../../common/three';
+import * as THREE from '../../common/three';
 import conceptTreeNodes from '../../common/concept-tree-nodes';
+import TWEEN from '@tweenjs/tween.js';
 import './ConceptTree.css';
 
 class ConceptTree extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isRunning: true,
+        };
+        this.animate = this.animate.bind(this);
+        this.onMouseclick = this.onMouseclick.bind(this);
+        this.onResize = this.onResize.bind(this);
+        this.onMousemove = this.onMousemove.bind(this);
+    }
 
     componentDidMount() {
         this.initThree();
         this.indexStack = [0];
         this.meshes = [];
-        this.initBubbles();
+        this.textLoader = new THREE.FontLoader();
+        this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
+            this.font = font;
+            this.initNodes();
+        });
     }
 
     initThree() {
         let threeRoot = this.refs['window'];
-        let {width, height} = threeRoot.getBoundingClientRect();
-        this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
-        this.camera.position.z = 0;
-        this.camera.lookAt(0, 0, -10000);
-        this.renderer = new THREE.WebGLRenderer({antialias: false, alpha: true});
+        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 10000);
+        this.camera.position.set( 0, 0, 1 );
+        this.camera.lookAt(0, 0, -500);
+        console.log(this.camera);
+        this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(width, height);
         this.renderer.sortObjects = false;
         this.renderer.autoClear = false;
         this.renderer.setPixelRatio(width / height);
         threeRoot.appendChild(this.renderer.domElement);
         this.scene = new THREE.Scene();
-        this.scene.fog = new THREE.FogExp2(0x05050c, 0.0005);
         this.scene.background = new THREE.CubeTextureLoader()
             .setPath( '/image/' )
             .load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-        let light = new THREE.AmbientLight(0xFFFFFF, 1);
-        this.scene.add(light);
+        let dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+        dirLight.position.set( 0, 0, 1 ).normalize();
+        this.scene.add(dirLight);
+        let pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+        pointLight.position.set( 0, 100, 90 );
+        this.scene.add(pointLight);
+        this.mouse = new THREE.Vector2();
         this.animate();
 
-        this.bubbleGeometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
-        this.bubbleMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: this.scene.background, refractionRatio: 0.95 } );
-        this.bubbleMaterial.envMap.mapping = THREE.CubeRefractionMapping;
+        this.textMaterial = [
+            new THREE.MeshLambertMaterial( { color: 0xffffff, flatShading: true, } ), // front
+            new THREE.MeshLambertMaterial( { color: 0xffffff, } ) // side
+        ];
+        this.textMaterialHover = [
+            new THREE.MeshLambertMaterial( { color: 0xffff00, flatShading: true, } ), // front
+            new THREE.MeshLambertMaterial( { color: 0xffff00, } ) // side
+        ];
+
+        this.raycaster = new THREE.Raycaster();
+
+        threeRoot.addEventListener('resize', this.onResize, false);
+        threeRoot.addEventListener('click', this.onMouseclick, false);
+        threeRoot.addEventListener('mousemove', this.onMousemove, false);
     }
 
-    initBubbles() {
+    onResize() {
+        let threeRoot = this.refs['window'];
+        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+    }
+
+    onMouseclick(event) {
+        if (this.isAnimating) { return; }
+        this.isAnimating = true;
+        let threeRoot = this.refs['window'];
+        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        this.mouse.x = ( event.clientX / width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - 56) / height ) * 2 + 1;
+        this.raycaster.setFromCamera( this.mouse, this.camera );
+
+        // calculate objects intersecting the picking ray
+        let intersects = this.raycaster.intersectObjects( this.scene.children );
+        if (intersects.length > 0 && intersects[0].object.name !== undefined) {
+            this.indexStack.push(intersects[0].object.name);
+            this.initNodes();
+        }
+    }
+
+    componentWillUnmount() {
+        let threeRoot = this.refs['window'];
+        threeRoot.removeEventListener('resize', this.onResize);
+        threeRoot.removeEventListener('click', this.onMouseclick);
+        threeRoot.removeEventListener('mousemove', this.onMousemove);
+    }
+
+    initNodes() {
         let cursor = conceptTreeNodes;
         let depth = 0;
-        let radius = 0;
-        let dRadius = 50 / .7;
-        this.indexStack.forEach(index => {
+        let positions = [
+            { x: 0, y: 0, z: -500, offsetX: 1, offsetZ: 0, },
+            { x: 500, y: 0, z: 0, offsetX: 0, offsetZ: 1, },
+            { x: 0, y: 0, z: 500, offsetX: -1, offsetZ: 0, },
+            { x: -500, y: 0, z: 0, offsetX: 1, offsetZ: 0, },
+        ];
+        let rotationYs = [0, -Math.PI / 2, Math.PI, -Math.PI / 2,];
+        this.indexStack.forEach((index, stepIdx) => {
             if (cursor.children && cursor.children.length > 0) {
-                cursor = cursor.children[index];
+                let childrenCount = cursor.children.length;
+                let totalHeight = 60 * childrenCount;
                 cursor.children.forEach((item, idx) => {
                     if (this.meshes[depth + '-' + idx] === undefined) {
-                        let mesh = new THREE.Mesh(this.bubbleGeometry, this.bubbleMaterial);
-                        mesh.position.x = radius * Math.cos(idx * 30 * Math.PI / 180);
-                        mesh.position.y = radius * Math.sin(idx * 30 * Math.PI / 180);
-                        this.scene.add(mesh);
-                        this.meshes[depth + '-' + idx] = mesh;
+                        let textGeo = new THREE.TextGeometry(item.name, {
+                            font: this.font,
+                            size: 40,
+                            height: 20,
+                            curveSegments: 4,
+                            bevelThickness: 2,
+                            bevelSize: 1.5,
+                            bevelEnabled: true,
+                        });
+                        textGeo = new THREE.BufferGeometry().fromGeometry(textGeo);
+                        textGeo.computeBoundingBox();
+                        textGeo.computeVertexNormals();
+                        // let boundingGeo = new THREE.CubeGeometry(textGeo.boundingBox.max.x - textGeo.boundingBox.min.x,
+                        //     40, 20);
+                        // let boundingMesh = new THREE.Mesh(boundingGeo, new THREE.MeshBasicMaterial());
+                        let centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+                        let textMesh = new THREE.Mesh(textGeo, this.textMaterial);
+                        textMesh.position.x = positions[stepIdx].x + centerOffset * positions[stepIdx].offsetX;
+                        textMesh.position.y = -totalHeight / 2 + idx * 60;
+                        textMesh.position.z = positions[stepIdx].z + centerOffset * positions[stepIdx].offsetZ;
+                        textMesh.rotation.y = rotationYs[stepIdx];
+                        textMesh.name = idx;
+                        this.scene.add(textMesh);
+                        // this.scene.add(boundingMesh);
+                        this.meshes[depth + '-' + idx] = textMesh;
                     }
                 });
+                cursor = cursor.children[index];
             }
-            radius += dRadius * .7;
             depth++;
         });
+        console.log(this.meshes);
+        this.panTo(-(this.indexStack.length - 1) * Math.PI / 2);
+    }
+
+    onMousemove(event) {
+        let threeRoot = this.refs['window'];
+        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        this.mouse.x = ( event.clientX / width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - 56) / height ) * 2 + 1;
+        this.raycaster.setFromCamera( this.mouse, this.camera );
+
+        let intersects = this.raycaster.intersectObjects( this.scene.children );
+        if (intersects.length > 0 && intersects[0].object.name !== undefined) {
+            if (this.INTERSECTED !== intersects[0].object) {
+                if (this.INTERSECTED) {
+                    this.INTERSECTED.material = this.textMaterial;
+                }
+                this.INTERSECTED = intersects[0].object;
+                this.INTERSECTED.material = this.textMaterialHover;
+            }
+        } else {
+            if (this.INTERSECTED) this.INTERSECTED.material = this.textMaterial;
+            this.INTERSECTED = null;
+        }
+    }
+
+    panTo(radian) {
+        let from = { x: Math.cos(this.camera.rotation.y + Math.PI / 2) * 500, z: -Math.sin(this.camera.rotation.y + Math.PI / 2) * 500};
+        let to = { x: Math.cos(radian + Math.PI / 2) * 500, z: -Math.sin(radian + Math.PI / 2) * 500};
+        new TWEEN.Tween(from).to(to, 500).easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(() => this.camera.lookAt(from.x, 0, from.z))
+            .onComplete(() => {
+                this.camera.lookAt(to.x, 0, to.z);
+                this.isAnimating = false;
+            })
+            .start();
+
     }
 
     animate() {
         if (this.state.isRunning) {
             this.renderer.render(this.scene, this.camera);
             requestAnimationFrame(this.animate);
+            TWEEN.update();
         }
     }
 
     render() {
-        return <div className="concept-three__wrapper"/>;
+        return <div ref="window" className="concept-three__wrapper"/>;
     }
 }
+
+export default ConceptTree;
