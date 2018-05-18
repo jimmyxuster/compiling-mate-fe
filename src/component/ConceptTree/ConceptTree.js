@@ -4,6 +4,9 @@ import conceptTreeNodes from '../../common/concept-tree-nodes';
 import TWEEN from '@tweenjs/tween.js';
 import './ConceptTree.css';
 
+const FLAG_BACK = -2;
+const FLAG_PAGE = -1;
+
 class ConceptTree extends React.Component {
 
     constructor(props) {
@@ -20,7 +23,7 @@ class ConceptTree extends React.Component {
     componentDidMount() {
         this.initThree();
         this.indexStack = [0];
-        this.meshes = [0];
+        this.meshes = [];
         this.textLoader = new THREE.FontLoader();
         this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
             this.font = font;
@@ -34,7 +37,6 @@ class ConceptTree extends React.Component {
         this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 10000);
         this.camera.position.set( 0, 0, 1 );
         this.camera.lookAt(0, 0, -500);
-        console.log(this.camera);
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(width, height);
         this.renderer.sortObjects = false;
@@ -81,7 +83,6 @@ class ConceptTree extends React.Component {
 
     onMouseclick(event) {
         if (this.isAnimating) { return; }
-        this.isAnimating = true;
         let threeRoot = this.refs['window'];
         let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
         this.mouse.x = ( event.clientX / width ) * 2 - 1;
@@ -90,10 +91,25 @@ class ConceptTree extends React.Component {
 
         // calculate objects intersecting the picking ray
         let intersects = this.raycaster.intersectObjects( this.scene.children );
-        if (intersects.length > 0 && intersects[0].object.name !== undefined && intersects[0].object.name >= 0) {
-            this.indexStack.push(intersects[0].object.name);
-            console.log(this.indexStack)
-            this.initNodes();
+        if (intersects.length > 0 && intersects[0].object.name !== undefined) {
+            let { name } = intersects[0].object;
+            if (name >= 0) {
+                this.indexStack.push(intersects[0].object.name);
+                this.initNodes();
+            } else if (name === FLAG_PAGE) {
+                // TODO: navigate to detail page
+            } else if (name === FLAG_BACK) {
+                this.indexStack = this.indexStack.slice(0, -1);
+                let i = -2;
+                while (this.meshes[`${this.indexStack.length}-${i}`] || i < 0) {
+                    if (this.meshes[`${this.indexStack.length}-${i}`]) {
+                        this.scene.remove(this.meshes[`${this.indexStack.length}-${i}`]);
+                        delete this.meshes[`${this.indexStack.length}-${i}`];
+                    }
+                    i++;
+                }
+                this.initNodes();
+            }
         }
     }
 
@@ -105,37 +121,55 @@ class ConceptTree extends React.Component {
     }
 
     initNodes() {
+        this.isAnimating = true;
         let cursor = conceptTreeNodes;
-        let depth = 0;
         let positions = [
             { x: 0, y: 0, z: -500, offsetX: 1, offsetZ: 0, },
             { x: 500, y: 0, z: 0, offsetX: 0, offsetZ: 1, },
             { x: 0, y: 0, z: 500, offsetX: -1, offsetZ: 0, },
             { x: -500, y: 0, z: 0, offsetX: 1, offsetZ: 0, },
         ];
-        let rotationYs = [0, -Math.PI / 2, Math.PI, -Math.PI / 2,];
+        let rotationYs = [0, -Math.PI / 2, Math.PI, Math.PI / 2,];
         let stepCount = this.indexStack.length;
+        this.clearUnnecessaryMeshes();
         this.indexStack.forEach((index, stepIdx) => {
             cursor = cursor.children[index];
-            console.log('cursor', cursor)
             if (cursor.children && cursor.children.length > 0) {
                 let childrenCount = cursor.children.length;
                 let totalHeight = 60 * childrenCount;
                 if (stepIdx >= stepCount - 4) {
+                    if (stepIdx > 0) {
+                        this.addTextMesh(-1, 'Back', FLAG_BACK, Object.assign({}, positions[stepIdx % 4], {y: -totalHeight / 2 - 60}), stepIdx, totalHeight, rotationYs[stepIdx % 4]);
+                    }
+                    let globalIdx = stepIdx;
+                    stepIdx %= 4;
                     cursor.children.forEach((item, idx) => {
-                        this.addTextMesh(depth, idx, item, positions, stepIdx, totalHeight, rotationYs);
+                        this.addTextMesh(idx, item.name, item.children.length > 0 ? idx : FLAG_PAGE, positions[stepIdx], globalIdx, totalHeight, rotationYs[stepIdx]);
                     });
                 }
             }
-            depth++;
         });
-        console.log(this.meshes);
+        // console.log(this.meshes);
         this.panTo(-(this.indexStack.length - 1) * Math.PI / 2);
     }
 
-    addTextMesh(depth, idx, item, positions, stepIdx, totalHeight, rotationYs) {
-        if (this.meshes[depth + '-' + idx] === undefined) {
-            let textGeo = new THREE.TextGeometry(item.name, {
+    clearUnnecessaryMeshes() {
+        for (let i = 0; i < this.indexStack.length - 4; i++) {
+            let j = -2;
+            while (this.meshes[`${i}-${j}`] || j < 0) {
+                if (this.meshes[`${i}-${j}`]) {
+                    this.scene.remove(this.meshes[`${i}-${j}`]);
+                    delete this.meshes[`${i}-${j}`];
+                }
+                j++;
+            }
+        }
+    }
+
+    addTextMesh(idx, text, name, positions, stepIdx, totalHeight, rotationY) {
+        if (this.meshes[stepIdx + '-' + idx] === undefined) {
+            // console.log('add mesh: id = ' + idx + ', text = ' + text)
+            let textGeo = new THREE.TextGeometry(text, {
                 font: this.font,
                 size: 40,
                 height: 20,
@@ -152,14 +186,14 @@ class ConceptTree extends React.Component {
             // let boundingMesh = new THREE.Mesh(boundingGeo, new THREE.MeshBasicMaterial());
             let centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             let textMesh = new THREE.Mesh(textGeo, this.textMaterial);
-            textMesh.position.x = positions[stepIdx].x + centerOffset * positions[stepIdx].offsetX;
+            textMesh.position.x = positions.x + centerOffset * positions.offsetX;
             textMesh.position.y = -totalHeight / 2 + idx * 60;
-            textMesh.position.z = positions[stepIdx].z + centerOffset * positions[stepIdx].offsetZ;
-            textMesh.rotation.y = rotationYs[stepIdx];
-            textMesh.name = item.children.length > 0 ? idx : -1;
+            textMesh.position.z = positions.z + centerOffset * positions.offsetZ;
+            textMesh.rotation.y = rotationY;
+            textMesh.name = name;
             this.scene.add(textMesh);
             // this.scene.add(boundingMesh);
-            this.meshes[depth + '-' + idx] = textMesh;
+            this.meshes[stepIdx + '-' + idx] = textMesh;
         }
     }
 
@@ -173,7 +207,6 @@ class ConceptTree extends React.Component {
         let intersects = this.raycaster.intersectObjects( this.scene.children );
         if (intersects.length > 0 && intersects[0].object.name !== undefined) {
             if (this.INTERSECTED !== intersects[0].object) {
-                console.log(intersects);
                 if (this.INTERSECTED) {
                     this.INTERSECTED.material = this.textMaterial;
                 }
@@ -187,12 +220,14 @@ class ConceptTree extends React.Component {
     }
 
     panTo(radian) {
-        let from = { x: Math.cos(this.camera.rotation.y + Math.PI / 2) * 500, z: -Math.sin(this.camera.rotation.y + Math.PI / 2) * 500};
+        this.cameraRotation = this.cameraRotation || 0;
+        let from = { x: Math.cos(this.cameraRotation + Math.PI / 2) * 500, z: -Math.sin(this.cameraRotation + Math.PI / 2) * 500};
         let to = { x: Math.cos(radian + Math.PI / 2) * 500, z: -Math.sin(radian + Math.PI / 2) * 500};
         new TWEEN.Tween(from).to(to, 500).easing(TWEEN.Easing.Quadratic.Out)
             .onUpdate(() => this.camera.lookAt(from.x, 0, from.z))
             .onComplete(() => {
                 this.camera.lookAt(to.x, 0, to.z);
+                this.cameraRotation = radian;
                 this.isAnimating = false;
             })
             .start();
