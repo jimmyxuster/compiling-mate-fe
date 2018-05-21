@@ -1,5 +1,5 @@
 export default {
-    children: [{
+    // children: [{
         name: 'dummy',
         children: [{
             name: 'Compilers',
@@ -50,6 +50,6 @@ export default {
                 },
             ]
         }]
-    }
-    ]
+    // }
+    // ]
 }

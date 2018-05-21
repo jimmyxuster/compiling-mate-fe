@@ -25,18 +25,68 @@ class ConceptTree extends React.Component {
         this.indexStack = [0];
         this.meshes = [];
         this.textLoader = new THREE.FontLoader();
-        this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
-            this.font = font;
-            this.initNodes();
-        });
+        this.initBoxes();
+        this.group.position.y = -this.height / 2;
+        this.scene.add(this.group);
+        // this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
+        //     this.font = font;
+        //     this.initNodes();
+        // });
+    }
+
+    initBoxes(cursor = conceptTreeNodes, nextWidth = 60, lastX = 0, nextY = 0) {
+        if (cursor.children && cursor.children.length > 0) {
+            let childWidth = nextWidth / cursor.children.length;
+            this.height += childWidth / cursor.children.length;
+            const startX = lastX - cursor.children.length * childWidth / 2;
+            cursor.children.forEach((child, index) => {
+                this.addBox(childWidth, child.name, startX + index * childWidth + childWidth / 2, nextY + childWidth / 2,
+                    30 - childWidth / 2)
+            });
+            cursor.children.forEach((child, index) => {
+                this.addBox(childWidth, child.name, startX + index * childWidth + childWidth / 2, nextY + childWidth / 2,
+                    -30 + childWidth / 2)
+            });
+            cursor.children.forEach((child, index) => {
+                this.initBoxes(child, nextWidth / cursor.children.length, startX + index * childWidth + childWidth / 2,
+                    nextY + childWidth)
+            })
+        }
+    }
+
+    addBox(width, text, positionX, positionY, positionZ) {
+        let threeRoot = this.refs['window'];
+        let [cWidth, cHeight] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        var geometry = new THREE.BoxGeometry(width, width, width);
+        let canvas = document.createElement('canvas');
+        canvas.width = cWidth / 60 * width;
+        canvas.height = cHeight / 60 * width;
+        let ctx = canvas.getContext('2d');
+        ctx.font = '60pt Arial';
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        let texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = this.renderer.getMaxAnisotropy();
+        var material = new THREE.MeshBasicMaterial({ map: texture });
+        var box = new THREE.Mesh( geometry, material );
+        box.position.x = positionX;
+        box.position.y = positionY;
+        box.position.z = positionZ;
+        this.group.add(box);
     }
 
     initThree() {
         let threeRoot = this.refs['window'];
         let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        this.height = 0;
+        this.group = new THREE.Group();
         this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 10000);
-        this.camera.position.set( 0, 0, 1 );
-        this.camera.lookAt(0, 0, -500);
+        this.camera.position.set( 0, 0, 300 );
+        this.camera.lookAt(0, 0, 0);
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(width, height);
         this.renderer.sortObjects = false;
@@ -54,6 +104,8 @@ class ConceptTree extends React.Component {
         pointLight.position.set( 0, 100, 90 );
         this.scene.add(pointLight);
         this.mouse = new THREE.Vector2();
+        this.controls = new THREE.OrbitControls(this.camera);
+        this.controls.update();
         this.animate();
 
         this.textMaterial = [
@@ -69,7 +121,7 @@ class ConceptTree extends React.Component {
 
         threeRoot.addEventListener('resize', this.onResize, false);
         threeRoot.addEventListener('click', this.onMouseclick, false);
-        threeRoot.addEventListener('mousemove', this.onMousemove, false);
+        // threeRoot.addEventListener('mousemove', this.onMousemove, false);
     }
 
     onResize() {
@@ -221,13 +273,28 @@ class ConceptTree extends React.Component {
 
     panTo(radian) {
         this.cameraRotation = this.cameraRotation || 0;
-        let from = { x: Math.cos(this.cameraRotation + Math.PI / 2) * 500, z: -Math.sin(this.cameraRotation + Math.PI / 2) * 500};
-        let to = { x: Math.cos(radian + Math.PI / 2) * 500, z: -Math.sin(radian + Math.PI / 2) * 500};
-        new TWEEN.Tween(from).to(to, 500).easing(TWEEN.Easing.Quadratic.Out)
-            .onUpdate(() => this.camera.lookAt(from.x, 0, from.z))
+        if (radian === this.cameraRotation) {
+            this.isAnimating = false;
+            return;
+        }
+        let dRotation = radian - this.cameraRotation;
+        let originRotation = this.cameraRotation;
+        let val = { val: 0 };
+        // let from = { x: Math.cos(this.cameraRotation + Math.PI / 2) * 500, z: -Math.sin(this.cameraRotation + Math.PI / 2) * 500};
+        // let to = { x: Math.cos(radian + Math.PI / 2) * 500, z: -Math.sin(radian + Math.PI / 2) * 500};
+        new TWEEN.Tween(val).to({ val: 1 }, 500).easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(() => {
+                this.cameraRotation = originRotation + dRotation * val.val;
+                this.camera.lookAt(Math.cos(this.cameraRotation + Math.PI / 2) * 500, 0,
+                    -Math.sin(this.cameraRotation + Math.PI / 2) * 500);
+                this.camera.position.set(-Math.cos(this.cameraRotation + Math.PI / 2) * 2000 * (val.val > 0.5 ? 1 - val.val : val.val), 0,
+                    Math.sin(this.cameraRotation + Math.PI / 2) * 2000 * (val.val > 0.5 ? 1 - val.val : val.val))
+            })
             .onComplete(() => {
-                this.camera.lookAt(to.x, 0, to.z);
+                this.camera.lookAt(Math.cos(radian + Math.PI / 2) * 500, 0, -Math.sin(radian + Math.PI / 2) * 500);
+                this.camera.position.set(0, 0, 0);
                 this.cameraRotation = radian;
+                this.camera.zoom = 5;
                 this.isAnimating = false;
             })
             .start();
@@ -237,6 +304,7 @@ class ConceptTree extends React.Component {
     animate() {
         if (this.state.isRunning) {
             this.renderer.render(this.scene, this.camera);
+            this.controls.update();
             requestAnimationFrame(this.animate);
             TWEEN.update();
         }
