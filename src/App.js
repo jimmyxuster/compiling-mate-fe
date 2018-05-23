@@ -3,7 +3,7 @@ import { Layout, Menu } from 'antd';
 import './App.css';
 import { BrowserRouter as Router, Route, Link }  from 'react-router-dom';
 import ConceptTree from "./component/ConceptTree/ConceptTree";
-import LexPage from './component/Lex/LexPage';
+import LexPage from './component/LexPage/LexPage';
 const { Header, Content, Sider } = Layout;
 
 class App extends Component {
