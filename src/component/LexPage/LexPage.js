@@ -128,6 +128,7 @@ class LexPage extends Component {
                         </div>
                     </Spin>
                 </div>
+                <ThompsonCard/>
             </div>
         )
     }
