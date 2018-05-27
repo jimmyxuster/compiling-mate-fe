@@ -68,6 +68,11 @@ class NodeChart extends React.Component {
         setTimeout(() => {
             this.chart.resize();
         }, 0);
+        this.chart.on('click', (params) => {
+            if (this.props.onClick) {
+                this.props.onClick(params);
+            }
+        })
         window.addEventListener('resize', this.onResize, false)
     }
 

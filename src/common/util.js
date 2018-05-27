@@ -3,6 +3,7 @@ function parseNodeFromStepAdd(step, nodes) {
         id: step.node.id,
         name: step.node.text,
         value: parseProduction(step.node.production),
+        rawProduction: step.node.production,
         level: step.node.relatedTo ? nodes.find(node => node.id === step.node.relatedTo).level + 1 : 1,
     }]
 }
