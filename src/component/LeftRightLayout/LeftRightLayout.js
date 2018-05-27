@@ -1,24 +1,51 @@
 import React from 'react';
 import { Menu, Layout } from 'antd';
-import { Route } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 import SLR from '../SLR/SLR'
+import menuConfig from '../../common/menu-config';
 const { Sider, Content } = Layout;
 
 class LeftRightLayout extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.refreshMenus();
+    }
+
+    componentWillReceiveProps(newProps) {
+        if ('location' in newProps) {
+            this.refreshMenus();
+        }
+    }
+
+    refreshMenus() {
+        if (!!this.props.location) {
+            let locs = this.props.location.pathname.split('/');
+
+            if (locs.length > 1 && locs[1] in menuConfig) {
+                let menu = menuConfig[locs[1]];
+                if (this.state === undefined) {
+                    this.state = {menus: menu};
+                } else {
+                    this.setState({menus: menu});
+                }
+            }
+            if (locs.length === 2) {
+                this.props.history.replace(menuConfig[locs[1]][0].to, null);
+            }
+        }
+    }
+
     render () {
         return (
             <Layout>
                 <Sider width={200} style={{ background: '#fff' }}>
                     <Menu
                         mode="inline"
-                        defaultSelectedKeys={['1']}
-                        defaultOpenKeys={['sub1']}
+                        defaultSelectedKeys={['0']}
                         style={{ height: '100%', borderRight: 0 }}
                     >
-                        <Menu.Item key="1">option1</Menu.Item>
-                        <Menu.Item key="2">option2</Menu.Item>
-                        <Menu.Item key="3">option3</Menu.Item>
-                        <Menu.Item key="4">option4</Menu.Item>
+                        {this.state.menus.map((menu, index) => <Menu.Item key={index}><Link to={menu.to}>{menu.name}</Link></Menu.Item>)}
                     </Menu>
                 </Sider>
                 <Layout className="lr__content" style={{ padding: '24px 24px' }}>

@@ -1,9 +1,10 @@
 import React from 'react'
-import {Row, Col, Button, Icon} from 'antd'
+import {Row, Col, Button, Icon, Table} from 'antd'
 import NodeChart from '../NodeChart/NodeChart'
 import api from '../../service/api'
 import {calcNodePositions, parseNodeStates} from '../../common/util'
 import './SLR.css'
+const {Column, ColumnGroup} = Table;
 
 class SLR extends React.Component {
 
@@ -15,7 +16,11 @@ class SLR extends React.Component {
             states: [],
             currData: [],
             currLinks: [],
-            focusNode: null
+            focusNode: null,
+            terminals: [],
+            nonTerminals: [],
+            parseTable: [],
+            tableDisplay: [],
         }
 
         this.backward = this.backward.bind(this)
@@ -37,7 +42,8 @@ class SLR extends React.Component {
     fetchSolution(cfg = []) {
         api.parsingSyntaxProcessingOutput(cfg).then(res => {
             if (res.code === 0) {
-                this.parseGraphData(res.data.treeSteps)
+                this.parseGraphData(res.data.treeSteps);
+                this.parseTable(res.data.symbols, res.data.parseTable);
             }
         })
     }
@@ -57,20 +63,62 @@ class SLR extends React.Component {
         })
     }
 
+    parseTable(symbols, table) {
+        let delim = symbols.indexOf('$');
+        let terminals = [];
+        let nonTerminals = [];
+        if (delim >= 0) {
+            terminals = symbols.slice(0, delim + 1);
+            nonTerminals = symbols.slice(delim + 1);
+        } else {
+            terminals = symbols;
+        }
+        terminals = ['state'].concat(terminals);
+        table = table.map((row, index) => {
+            let obj = Object.create(null);
+            symbols.forEach((sym, index) => Object.assign(obj, {[sym]: row[index]}));
+            obj.key = index;
+            Object.assign(obj, {state: index})
+            return obj;
+        })
+        this.setState({
+            parseTable: table,
+            terminals,
+            nonTerminals,
+        });
+        this.refreshParseTable(0);
+    }
+
+    refreshParseTable(stepCount) {
+        let tableDisplay = [];
+        if (stepCount === this.state.totalStep - 1) {
+            tableDisplay = this.state.parseTable;
+        } else {
+            for (let i = 0; i < stepCount + 1; i++) {
+                tableDisplay.push({state: i, key: i});
+            }
+        }
+        this.setState({
+            tableDisplay
+        })
+    }
+
     backward() {
         if (this.state.stepCount > 0) {
+            this.refreshParseTable(this.state.stepCount - 1);
             let prevState = this.state.states[this.state.stepCount - 1]
             calcNodePositions(prevState.data)
             this.setState({
                 currData: prevState.data,
                 currLinks: prevState.links,
                 stepCount: this.state.stepCount - 1
-            })
+            });
         }
     }
 
     forward() {
         if (this.state.stepCount < this.state.totalStep - 1) {
+            this.refreshParseTable(this.state.stepCount + 1);
             let nextState = this.state.states[this.state.stepCount + 1]
             calcNodePositions(nextState.data)
             this.setState({
@@ -134,7 +182,28 @@ class SLR extends React.Component {
 
                 </Col>
                 <Col span={12} className="slr__col">
-
+                    <Table dataSource={this.state.tableDisplay} defaultExpandAllRows={true} pagination={false}>
+                        <ColumnGroup title="Action Table">
+                            {this.state.terminals.map(t => (
+                                <Column
+                                    align="center"
+                                    title={t}
+                                    dataIndex={t}
+                                    key={t}
+                                />
+                            ))}
+                        </ColumnGroup>
+                        <ColumnGroup title="Goto Table">
+                            {this.state.nonTerminals.map(nt => (
+                                <Column
+                                    align="center"
+                                    title={nt}
+                                    dataIndex={nt}
+                                    key={nt}
+                                />
+                            ))}
+                        </ColumnGroup>
+                    </Table>
                 </Col>
             </Row>
         )

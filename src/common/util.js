@@ -42,6 +42,9 @@ function parseNodeStates(treeSteps) {
                 }
                 states.push(newState);
                 break;
+            default:
+                console.error('unsupported event type detected: ' + step.type);
+                break;
         }
     });
     return states;
