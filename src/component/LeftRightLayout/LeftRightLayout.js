@@ -26,7 +26,11 @@ class LeftRightLayout extends React.Component {
             if (locs.length > 1 && locs[1] in menuConfig) {
                 let menu = menuConfig[locs[1]];
                 if (this.state === undefined) {
-                    this.state = {menus: menu, selectedSideMenu: [menu[0].to]};
+                    if (locs.length === 2) {
+                        this.state = {menus: menu, selectedSideMenu: [menu[0].to]};
+                    } else {
+                        this.state = {menus: menu, selectedSideMenu: [this.props.location.pathname]};
+                    }
                 } else if (locs.length === 2) {
                     this.setState({menus: menu, selectedSideMenu: [menu[0].to]});
                 } else {
@@ -40,7 +44,6 @@ class LeftRightLayout extends React.Component {
     }
 
     handleMenuSelected({key}) {
-        console.log(key)
         let a = [];
         a.push(key)
         this.setState({selectedSideMenu: a});
@@ -55,7 +58,7 @@ class LeftRightLayout extends React.Component {
                         defaultSelectedKeys={['0']}
                         selectedKeys={this.state.selectedSideMenu}
                         style={{ height: '100%', borderRight: 0 }}
-                        onClick={({key}) => this.setState({selectedSideMenu: [key]})}
+                        onSelect={({key}) => this.setState({selectedSideMenu: [key]})}
                     >
                         {this.state.menus.map((menu, index) => <Menu.Item key={menu.to}><Link to={menu.to}>{menu.name}</Link></Menu.Item>)}
                     </Menu>

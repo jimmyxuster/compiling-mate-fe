@@ -66,7 +66,7 @@ class NodeChart extends React.Component {
             this.pendingLinks = null;
         }
         setTimeout(() => {
-            this.chart.resize();
+            this.onResize();
         }, 0);
         this.chart.on('click', (params) => {
             if (this.props.onClick) {
@@ -99,7 +99,7 @@ class NodeChart extends React.Component {
     onResize() {
         if (this.chart) {
             let {width, height} = this.refs['chart'].getBoundingClientRect()
-            this.chart.resize({width, height})
+            this.chart.resize({width, height: height - 40});
         }
     }
 
