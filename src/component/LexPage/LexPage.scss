@@ -1,0 +1,25 @@
+@import "../../common/consts.scss";
+
+.lex-page-container {
+  text-align: center;
+  .input-container {
+    position: relative;
+    max-width: 80%;
+    margin: 12px auto;
+    .gadget {
+      margin: 12px;
+    }
+  }
+  .algorithm-visualization-container {
+    text-align: initial;
+    .card-container {
+      text-align: center;
+      width: 100%;
+      .card {
+        max-width: 90%;
+        margin: auto;
+      }
+    }
+  }
+  
+}

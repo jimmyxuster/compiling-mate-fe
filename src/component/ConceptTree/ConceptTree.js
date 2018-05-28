@@ -3,6 +3,7 @@ import * as THREE from '../../common/three';
 import conceptTreeNodes from '../../common/concept-tree-nodes';
 import TWEEN from '@tweenjs/tween.js';
 import './ConceptTree.css';
+import { Spin } from 'antd';
 
 const FLAG_BACK = -2;
 const FLAG_PAGE = -1;
@@ -13,6 +14,7 @@ class ConceptTree extends React.Component {
         super(props);
         this.state = {
             isRunning: true,
+            loading: true,
         };
         this.animate = this.animate.bind(this);
         this.onMouseclick = this.onMouseclick.bind(this);
@@ -21,29 +23,38 @@ class ConceptTree extends React.Component {
     }
 
     componentDidMount() {
-        this.initThree();
-        this.indexStack = [0];
-        this.meshes = [];
-        this.textLoader = new THREE.FontLoader();
-        this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
-            this.font = font;
-            this.initNodes();
-        });
+        setTimeout(() => {
+            this.initThree();
+            this.indexStack = [0];
+            this.meshes = [];
+            this.textLoader = new THREE.FontLoader();
+            this.textLoader.load('/fonts/optimer_regular.typeface.json', font => {
+                this.font = font;
+                this.initNodes();
+                this.setState({loading: false});
+            });
+        }, 500);
+    }
+
+    getContainerRect() {
+        let threeRoot = this.refs['window'];
+        return threeRoot.getBoundingClientRect();
     }
 
     initThree() {
         let threeRoot = this.refs['window'];
-        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        let {width, height} = this.getContainerRect();
         this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 10000);
         this.camera.position.set( 0, 0, 1 );
         this.camera.lookAt(0, 0, -500);
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(width, height);
         this.renderer.sortObjects = false;
-        this.renderer.autoClear = false;
+        this.renderer.setClearColor(0xFFFFFF);
         this.renderer.setPixelRatio(width / height);
         threeRoot.appendChild(this.renderer.domElement);
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(255, 255, 255);
         this.scene.background = new THREE.CubeTextureLoader()
             .setPath( '/image/' )
             .load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
@@ -67,15 +78,13 @@ class ConceptTree extends React.Component {
 
         this.raycaster = new THREE.Raycaster();
 
-        threeRoot.addEventListener('resize', this.onResize, false);
+        window.addEventListener('resize', this.onResize, false);
         threeRoot.addEventListener('click', this.onMouseclick, false);
         threeRoot.addEventListener('mousemove', this.onMousemove, false);
     }
 
     onResize() {
-        let threeRoot = this.refs['window'];
-        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
-
+        let {width, height} = this.getContainerRect();
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
@@ -83,10 +92,9 @@ class ConceptTree extends React.Component {
 
     onMouseclick(event) {
         if (this.isAnimating) { return; }
-        let threeRoot = this.refs['window'];
-        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        let {width, height} = this.getContainerRect();
         this.mouse.x = ( event.clientX / width ) * 2 - 1;
-        this.mouse.y = - ( (event.clientY - 56) / height ) * 2 + 1;
+        this.mouse.y = - ( (event.clientY - 64) / height ) * 2 + 1;
         this.raycaster.setFromCamera( this.mouse, this.camera );
 
         // calculate objects intersecting the picking ray
@@ -115,7 +123,7 @@ class ConceptTree extends React.Component {
 
     componentWillUnmount() {
         let threeRoot = this.refs['window'];
-        threeRoot.removeEventListener('resize', this.onResize);
+        window.removeEventListener('resize', this.onResize);
         threeRoot.removeEventListener('click', this.onMouseclick);
         threeRoot.removeEventListener('mousemove', this.onMousemove);
     }
@@ -198,10 +206,9 @@ class ConceptTree extends React.Component {
     }
 
     onMousemove(event) {
-        let threeRoot = this.refs['window'];
-        let [width, height] = [threeRoot.offsetWidth, threeRoot.offsetHeight];
+        let {width, height} = this.getContainerRect();
         this.mouse.x = ( event.clientX / width ) * 2 - 1;
-        this.mouse.y = - ( (event.clientY - 56) / height ) * 2 + 1;
+        this.mouse.y = - ( (event.clientY - 64) / height ) * 2 + 1;
         this.raycaster.setFromCamera( this.mouse, this.camera );
 
         let intersects = this.raycaster.intersectObjects( this.scene.children );
@@ -243,7 +250,12 @@ class ConceptTree extends React.Component {
     }
 
     render() {
-        return <div ref="window" className="concept-three__wrapper"/>;
+        let loading = (<div className="concept-three__loading" style={{opacity: this.state.loading ? 1 : 0}}>
+            <Spin size="large"/>
+        </div>);
+        return (<div ref="window" className="concept-three__wrapper">
+            {loading}
+        </div>);
     }
 }
 

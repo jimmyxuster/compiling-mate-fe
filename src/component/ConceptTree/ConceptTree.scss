@@ -1,5 +1,21 @@
 @import "../../common/consts.scss";
 .concept-three__wrapper {
-  height: calc(100% - 56px);
+  position: relative;
+  flex-grow: 1;
   overflow: hidden;
+  .concept-three__loading {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 400ms linear;
+  }
 }
