@@ -128,7 +128,6 @@ class LexPage extends Component {
                         </div>
                     </Spin>
                 </div>
-                <NfaToDfaCard/>
             </div>
         )
     }
