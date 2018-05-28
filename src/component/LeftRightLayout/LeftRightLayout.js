@@ -10,6 +10,7 @@ class LeftRightLayout extends React.Component {
     constructor(props) {
         super(props);
         this.refreshMenus();
+        this.handleMenuSelected = this.handleMenuSelected.bind(this);
     }
 
     componentWillReceiveProps(newProps) {
@@ -25,7 +26,9 @@ class LeftRightLayout extends React.Component {
             if (locs.length > 1 && locs[1] in menuConfig) {
                 let menu = menuConfig[locs[1]];
                 if (this.state === undefined) {
-                    this.state = {menus: menu};
+                    this.state = {menus: menu, selectedSideMenu: [menu[0].to]};
+                } else if (locs.length === 2) {
+                    this.setState({menus: menu, selectedSideMenu: [menu[0].to]});
                 } else {
                     this.setState({menus: menu});
                 }
@@ -36,6 +39,13 @@ class LeftRightLayout extends React.Component {
         }
     }
 
+    handleMenuSelected({key}) {
+        console.log(key)
+        let a = [];
+        a.push(key)
+        this.setState({selectedSideMenu: a});
+    }
+
     render () {
         return (
             <Layout>
@@ -43,9 +53,11 @@ class LeftRightLayout extends React.Component {
                     <Menu
                         mode="inline"
                         defaultSelectedKeys={['0']}
+                        selectedKeys={this.state.selectedSideMenu}
                         style={{ height: '100%', borderRight: 0 }}
+                        onClick={({key}) => this.setState({selectedSideMenu: [key]})}
                     >
-                        {this.state.menus.map((menu, index) => <Menu.Item key={index}><Link to={menu.to}>{menu.name}</Link></Menu.Item>)}
+                        {this.state.menus.map((menu, index) => <Menu.Item key={menu.to}><Link to={menu.to}>{menu.name}</Link></Menu.Item>)}
                     </Menu>
                 </Sider>
                 <Layout className="lr__content" style={{ padding: '24px 24px' }}>
