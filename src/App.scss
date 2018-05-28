@@ -1,6 +1,8 @@
 @import "./common/consts.scss";
 .app {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .header-logo {
   width: 120px;

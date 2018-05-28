@@ -27,6 +27,12 @@
   },
   "devDependencies": {
     "babel-plugin-import": "^1.7.0",
+    "node-mock-server": "^0.23.1",
     "react-app-rewired": "^1.5.2"
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:3001"
+    }
   }
 }
