@@ -116,7 +116,7 @@ class LexPage extends Component {
                     {this.state.shouldShowReEmptyError
                         ? (<Alert message="RE不能为空" type="error" closable afterClose={this.handleClose}/>)
                         : null
-}
+                    }
                 </div>
 
                 <div className="algorithm-visualization-container">
@@ -128,7 +128,7 @@ class LexPage extends Component {
                         </div>
                     </Spin>
                 </div>
-                <ThompsonCard/>
+                <NfaToDfaCard/>
             </div>
         )
     }
