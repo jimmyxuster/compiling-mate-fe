@@ -80,7 +80,7 @@ function drawNfa(chart, data) {
         type: 'graph',
         layout: 'none',
         symbolSize: 35,
-        roam: true,
+        roam: false,
         label: {
           normal: {
             show: true

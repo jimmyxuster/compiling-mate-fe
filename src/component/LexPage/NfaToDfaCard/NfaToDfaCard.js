@@ -4,6 +4,7 @@ import * as echarts from 'echarts';
 import {drawNfa} from '../../../utils/nfa';
 import './NfaToDfaCard.css';
 import {nfa, dfa} from './MockData';
+import DfaGraph from '../DfaGraph/DfaGraph';
 
 class NfaToDfaCard extends Component {
   constructor() {
@@ -127,7 +128,7 @@ class NfaToDfaCard extends Component {
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <div className="dfa_graph"/>
+            <DfaGraph data={this.state.dfaData} edgeCount={step} nodeCount={tableData.length} />
           </Col>
           <Col span={12}>
             <div className="text-pad">
