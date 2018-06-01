@@ -1,5 +1,5 @@
 import React from 'react'
-import {Row, Col, Button, Icon, Table, Steps} from 'antd'
+import {Row, Col, Button, Icon, Table, Steps, Switch} from 'antd'
 import NodeChart from '../NodeChart/NodeChart'
 import api from '../../service/api'
 import {calcNodePositions, parseNodeStates} from '../../common/util'
@@ -24,12 +24,14 @@ class SLR extends React.Component {
             parseTable: [],
             tableDisplay: [],
             currentStep: 1,
+            directMode: false,
         }
 
         this.backward = this.backward.bind(this)
         this.forward = this.forward.bind(this)
         this.handleChartItemClick = this.handleChartItemClick.bind(this)
         this.handleCloseDetail = this.handleCloseDetail.bind(this)
+        this.handleDirectMode = this.handleDirectMode.bind(this)
     }
 
     componentDidMount() {
@@ -146,9 +148,18 @@ class SLR extends React.Component {
         this.setState({focusNode: null})
     }
 
+    handleDirectMode(checked) {
+        this.setState({
+            directMode: checked,
+        });
+    }
+
     render() {
         return (
             <div className="slr">
+                <div className="slr__toggle">
+                    显示全部产生式：<Switch onChange={this.handleDirectMode}/>
+                </div>
                 <Steps current={this.state.currentStep} size="small" className="slr__progress">
                     <Step key="input" title="输入CFG"/>
                     <Step key="compute" title="演示"/>
@@ -175,7 +186,7 @@ class SLR extends React.Component {
                             </div>
                         ) : null}
                         <div style={{display: this.state.focusNode ? 'none' : 'block', position: 'relative'}}>
-                            <NodeChart data={this.state.currData} links={this.state.currLinks}
+                            <NodeChart data={this.state.currData} links={this.state.currLinks} directMode={this.state.directMode}
                                        onClick={this.handleChartItemClick}/>
                             <div className="slr__operate-wrapper">
                                 <Button.Group size="medium" className="slr__operate">
