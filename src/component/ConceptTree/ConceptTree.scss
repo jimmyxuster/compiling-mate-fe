@@ -18,4 +18,65 @@
     opacity: 1;
     transition: opacity 400ms linear;
   }
+  .concept-tree__wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 40px;
+    color: #fff;
+    p {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      transition: transform 500ms linear;
+      &.expand {
+        transform: translateX(-50%) translateY(-300px);
+      }
+    }
+    .concept-tree__arrow {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translateX(-50%) translateY(50px) rotate(90deg);
+      transition: transform 500ms linear;
+      cursor: pointer;
+      &.expand {
+        transform: translateX(-50%) translateY(250px) rotate(90deg);
+      }
+    }
+    .concept-tree__echart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100px;
+      height: 100px;
+      transform: translateX(-50%) translateY(-50%);
+      &.expand {
+        width: 50%;
+        height: 450px;
+      }
+      &.hidden {
+        display: none;
+      }
+    }
+    .concept-tree__desc {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 50%;
+      height: 450px;
+      transform: translateX(-50%) translateY(-50%);
+      display: none;
+      &.visible {
+        display: block;
+      }
+      .emphasis {
+        color: #ff0000;
+        text-decoration: underline;
+      }
+    }
+  }
 }

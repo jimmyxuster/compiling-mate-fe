@@ -1,0 +1,87 @@
+{
+  "data": [
+    {
+      "name": "源程序",
+      "x": 0,
+      "y": 0,
+      "color": "#fff",
+      "symbolSize": [100, 100]
+    },
+    {
+      "name": "词法分析器",
+      "value": "lex",
+      "x": 150,
+      "y": 0,
+      "label": {
+        "textBorderColor": "#c23631",
+        "textBorderWidth": 3
+      }
+    },
+    {
+      "name": "记号",
+      "x": 300,
+      "y": 0,
+      "color": "#fff",
+      "symbolSize": [70, 80]
+    },
+    {
+      "name": "语法分析器",
+      "value": "syntax",
+      "x": 150,
+      "y": 100,
+      "label": {
+        "textBorderColor": "#c23631",
+        "textBorderWidth": 3
+      }
+    },
+    {
+      "name": "抽象语法树",
+      "x": 300,
+      "y": 100,
+      "color": "#fff"
+    },
+    {
+      "name": "语义分析器",
+      "value": "semantic",
+      "x": 150,
+      "y": 200,
+      "label": {
+        "textBorderColor": "#c23631",
+        "textBorderWidth": 3
+      }
+    },
+    {
+      "name": "中间表示",
+      "x": 300,
+      "y": 200,
+      "color": "#fff",
+      "symbolSize": [120, 120]
+    }
+  ],
+  "links": [
+    {
+      "source": "源程序",
+      "target": "词法分析器"
+    },
+    {
+      "source": "词法分析器",
+      "target": "记号"
+    },
+    {
+      "source": "记号",
+      "target": "语法分析器"
+    },
+    {
+      "source": "语法分析器",
+      "target": "抽象语法树"
+    },
+    {
+      "source": "抽象语法树",
+      "target": "语义分析器"
+    },
+    {
+      "source": "语义分析器",
+      "target": "中间表示"
+    }
+  ]
+}
