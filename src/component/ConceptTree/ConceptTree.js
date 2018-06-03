@@ -1,6 +1,6 @@
 import React from 'react';
 import * as THREE from '../../common/three';
-import {Icon} from 'antd';
+import {Icon, Button} from 'antd';
 import conceptTreeNodes from '../../common/concept-tree-nodes';
 import classNames from 'classnames';
 import TWEEN from '@tweenjs/tween.js';
@@ -8,6 +8,7 @@ import './ConceptTree.css';
 import { Spin } from 'antd';
 import ECharts from 'echarts';
 import mainGraph from './main';
+import lexGraph from './lex';
 import descriptions from './description';
 
 const FLAG_BACK = -2;
@@ -24,7 +25,11 @@ class ConceptTree extends React.Component {
             expanded: false,
             showDescription: false,
             description: '',
+            showMainButton: false,
         };
+        this.descChartData = {
+            lex: lexGraph,
+        }
         this.option = {
             title: {
                 show: false,
@@ -75,6 +80,7 @@ class ConceptTree extends React.Component {
         // this.onMouseclick = this.onMouseclick.bind(this);
         this.onResize = this.onResize.bind(this);
         this.handleExpand = this.handleExpand.bind(this);
+        this.handleMainPage = this.handleMainPage.bind(this);
         // this.onMousemove = this.onMousemove.bind(this);
     }
 
@@ -310,9 +316,12 @@ class ConceptTree extends React.Component {
     }
 
     handleExpand() {
-        if (this.state.expanded) { return; }
-        this.setState({expanded: true});
-        this.showMainConceptChart();
+        if (!this.state.expanded) {
+            this.setState({expanded: true});
+            this.showMainConceptChart();
+        } else {
+            this.showDescriptionChart();
+        }
     }
 
     showMainConceptChart() {
@@ -324,15 +333,34 @@ class ConceptTree extends React.Component {
         }, 0);
     }
 
+    showDescriptionChart() {
+        this.option.series[0].data = this.descChartData[this.descValue].data;
+        this.option.series[0].links = this.descChartData[this.descValue].links;
+        this.chart.setOption(this.option);
+        this.setState({
+            showDescription: false,
+            showMainButton: true,
+        });
+    }
+
     handleChartClick(params) {
-        const value = params.data.value;
-        if (value && value.length > 0) {
+        this.descValue = params.data.value;
+        if (this.descValue && this.descValue.length > 0) {
             this.setState({
                 title: params.data.name,
                 description: descriptions[params.data.value] || 'no description',
                 showDescription: true,
             });
         }
+    }
+
+    handleMainPage() {
+        this.setState({
+            expanded: false,
+            showDescription: false,
+            description: '',
+            showMainButton: false,
+        })
     }
 
     render() {
@@ -343,6 +371,7 @@ class ConceptTree extends React.Component {
         let iconClass = classNames({'concept-tree__arrow': true, 'expand': this.state.expanded});
         let chartClass = classNames({'concept-tree__echart': true, 'expand': this.state.expanded, 'hidden': this.state.showDescription})
         let descClass = classNames({'concept-tree__desc': true, 'visible': this.state.showDescription});
+        let mainButtonClass = classNames({'concept-tree__back': true, 'visible': this.state.showMainButton});
 
         return (<div ref="window" className="concept-three__wrapper">
             {loading}
@@ -351,6 +380,7 @@ class ConceptTree extends React.Component {
                 <div className={chartClass} ref="echart"/>
                 <div className={descClass} ref="description" dangerouslySetInnerHTML={{__html: this.state.description}}/>
                 <Icon onClick={this.handleExpand} type="double-right" className={iconClass}/>
+                <Button className={mainButtonClass} onClick={this.handleMainPage}><Icon type="left" />返回</Button>
             </div>
         </div>);
     }

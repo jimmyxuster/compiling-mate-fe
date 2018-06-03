@@ -54,12 +54,23 @@
       width: 100px;
       height: 100px;
       transform: translateX(-50%) translateY(-50%);
+      display: none;
       &.expand {
+        display: block;
         width: 50%;
         height: 450px;
       }
       &.hidden {
         display: none;
+      }
+    }
+    .concept-tree__back {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      display: none;
+      &.visible {
+        display: block;
       }
     }
     .concept-tree__desc {
