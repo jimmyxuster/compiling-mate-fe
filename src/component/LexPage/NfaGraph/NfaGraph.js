@@ -78,6 +78,11 @@ function culPosition(data) {
           let n;
           n1 > n2 ? n = n2 : n = n1;
           rec(n, cx + 100, cy, offsety, deep);
+          res.links.find(val => val.from === current && val.to === (n1 > n2 ? n1:n2)).lineStyle = {
+            normal: {
+              curveness: 0.5
+            }
+            }
         }
       }
     }
