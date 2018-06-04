@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "name": "Regular Expression",
+      "x": 200,
+      "y": 0
+    },
+    {
+      "name": "DFA",
+      "x": 50,
+      "y": 150
+    },
+    {
+      "name": "NFA",
+      "x": 350,
+      "y": 150
+    }
+  ],
+  "links": [
+    {
+      "source": "Regular Expression",
+      "target": "DFA",
+      "label": {
+        "normal": {
+          "show": true,
+          "formatter": "DFA<--RE",
+          "fontSize": 16
+        }
+      }
+    },
+    {
+      "source": "Regular Expression",
+      "target": "NFA",
+      "label": {
+        "normal": {
+          "show": true,
+          "formatter": "Thompson构造法",
+          "fontSize": 16
+        }
+      }
+    },
+    {
+      "source": "NFA",
+      "target": "DFA",
+      "label": {
+        "normal": {
+          "show": true,
+          "formatter": "DFA<--NFA",
+          "fontSize": 16
+        }
+      }
+    }
+  ]
+}
