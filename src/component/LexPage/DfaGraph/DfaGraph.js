@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 import * as echarts from 'echarts';
 
-let dfaChart;
 class DfaGraph extends Component {
+  constructor() {
+    super();
+    this.state = {
+      dfaChart: null
+    }
+  }
+
   componentDidMount() {
-    dfaChart = echarts.init(document.getElementById('dfa_graph'));
+    this.setState({
+      dfaChart: echarts.init(document.getElementById('dfa_graph'))
+    })
   }
 
   render() {
-    if(this.props.data !== undefined && dfaChart !== undefined) {
+    if(this.props.data !== undefined && this.state.dfaChart !== null) {
       let {states, links} = this.props.data;
       let nodes = [];
       let edges = [];
@@ -32,7 +40,7 @@ class DfaGraph extends Component {
           },
         })
       })
-      dfaChart.setOption({
+      this.state.dfaChart.setOption({
         title: {
           text: 'DFA图'
         },
