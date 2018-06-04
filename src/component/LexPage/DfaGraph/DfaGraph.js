@@ -5,44 +5,6 @@ let dfaChart;
 class DfaGraph extends Component {
   componentDidMount() {
     dfaChart = echarts.init(document.getElementById('dfa_graph'));
-    let option = {
-      title: {
-        text: 'DFA图'
-      },
-      series: [{
-        type: 'graph',
-        roam: false,
-        layout: 'force',
-        animation: false,
-        data: [],
-        force: {
-            // initLayout: 'circular'
-            // gravity: 0
-            repulsion: 500,
-            edgeLength: 100
-        },
-        edges: [],
-        label: {
-          normal: {
-            show: true
-          }
-        },
-        edgeSymbol: [
-          'circle', 'arrow'
-        ],
-        edgeSymbolSize: [
-          4, 10
-        ],
-        lineStyle: {
-          normal: {
-            opacity: 0.9,
-            width: 2,
-            curveness: 0.3
-          }
-        }
-      }]
-    };
-    dfaChart.setOption(option);
   }
 
   render() {
@@ -65,15 +27,46 @@ class DfaGraph extends Component {
           label: {
             normal: {
               show: true,
-              formatter: 'as'
+              formatter: val.moveBy
             }
           },
         })
       })
       dfaChart.setOption({
+        title: {
+          text: 'DFA图'
+        },
         series: [{
+          type: 'graph',
+          roam: true,
+          layout: 'force',
+          animation: false,
           data: nodes,
-          edges: edges
+          force: {
+              // initLayout: 'circular'
+              // gravity: 0
+              repulsion: 500,
+              edgeLength: 100
+          },
+          edges: edges,
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          edgeSymbol: [
+            'circle', 'arrow'
+          ],
+          edgeSymbolSize: [
+            4, 10
+          ],
+          lineStyle: {
+            normal: {
+              opacity: 0.9,
+              width: 2,
+              curveness: 0.3
+            }
+          }
         }]
       })
     }
