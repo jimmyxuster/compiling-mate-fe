@@ -55,10 +55,21 @@ function culPosition(data) {
         let n1 = nexts[current][0];
         let n2 = nexts[current][1];
         if(visited[n1] || visited[n2]) {
-          if(visited[n1])
+          if(visited[n1]){
             rec(n2, cx + 100, cy, offsety,deep);
-          if(visited[n2])
+            res.links.find(val => val.from === current && val.to === n1).lineStyle = {
+                normal: {
+                  curveness: 0.5
+                }
+            }
+          }else if(visited[n2]){
             rec(n1, cx + 100, cy, offsety,deep);
+            res.links.find(val => val.from === current && val.to === n2).lineStyle = {
+                normal: {
+                  curveness: 0.5
+                }
+            }
+          }
         } else if(inDegree[n1] === 1 && inDegree[n2] === 1) {
           forkDeepStack.push(deep + 1);
           rec(n1, cx + 100, cy + 0.8*offsety, 0.8 * offsety, deep + 1);
@@ -81,11 +92,6 @@ function culPosition(data) {
               formatter: val.tag ? val.tag : 'ε'
             }
         };
-        val.lineStyle = {
-            normal: {
-              curveness: 0
-            }
-        }
     })
     return res;
   }
