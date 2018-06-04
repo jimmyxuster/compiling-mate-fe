@@ -11,6 +11,7 @@ import ThompsonCard from './ThompsonCard/ThompsonCard';
 import NfaToDfaCard from './NfaToDfaCard/NfaToDfaCard';
 import ReToDfaCard from './ReToDfaCard/ReToDfaCard';
 import './LexPage.css';
+import api from '../../service/api';
 
 class LexPage extends Component {
     constructor(props) {
@@ -37,14 +38,13 @@ class LexPage extends Component {
             lastRe: re
         });
 
-        let callback = () => {
+        api.reProcessingOutput({input: this.state.re, ruleName: this.state.re}).then(res => {
+            console.log(res);
             this.setState({
-                data: {thompsonData: "test"},
-                isLoading: false
-            });
-        }
-
-        setTimeout(callback, 1000);
+                isLoading: false,
+                data: res.data
+            })
+        })
     }
 
     onClickAlgorithm = (algorithm) => {
@@ -70,16 +70,19 @@ class LexPage extends Component {
     }
 
     render() {
+        let { tompsonData } = this.state.data;
         const loadingIcon = <Icon type="loading" style={{
             fontSize: 36
         }} spin/>;
 
         const cardMap = {
-            thompson: <ThompsonCard/>,
+            thompson: <ThompsonCard data={tompsonData}/>,
             nfaToDfa: <NfaToDfaCard/>,
             reToDfa: <ReToDfaCard/>
         };
         let currentCard = cardMap[this.state.currentAlgorithm];
+
+        
 
         return (
             <div className="lex-page-container">

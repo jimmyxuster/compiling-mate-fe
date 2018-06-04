@@ -1,30 +1,48 @@
 import React, {Component} from 'react';
 import {Card, Row, Col} from 'antd';
 import * as echarts from 'echarts';
-import setTreeAndGraph from './GraphTool';
+import NfaGraph from '../NfaGraph/NfaGraph';
+import ReTree from '../ReTree/ReTree';
 import './ThompsonCard.css';
 
 import {mockTreeData, mockGraphData} from './MockData';
 
 class ThompsonCard extends Component {
 
+  constructor() {
+    super();
+    this.state = {
+      currentId: null
+    }
+  }
   componentDidMount() {
-    let treeChart = echarts.init(document.getElementById('re_tree'));
-    let graphChart = echarts.init(document.getElementById('thompson_graph'));
-
-    setTreeAndGraph(mockTreeData, mockGraphData, treeChart, graphChart);
 
   }
 
   render() {
+    let nfaMap = {};
+    let reTree = {};
+    let data = this.props.data;
+    if(data !== undefined){
+      nfaMap = data.nfaMap;
+      reTree = data.reTree;
+    }
+    let currentId = this.state.currentId;
+    let currentGraphData = {nodes:[], links:[]};
+    if(nfaMap !== {}) {
+      currentGraphData = nfaMap[reTree.id];
+    }
+    if(currentId !== null) {
+      currentGraphData = nfaMap[currentId];
+    }
     return (
       <Card className="thompson-card" title="Thompson Algorithm" bordered={false}>
         <Row gutter={16}>
           <Col span={8}>
-            <div id="re_tree"/>
+            <ReTree data={[]} />
           </Col>
           <Col span={16}>
-            <div id="thompson_graph"/>
+            <NfaGraph data={currentGraphData} />
           </Col>
         </Row>
       </Card>
