@@ -1,24 +1,30 @@
 import React from 'react';
-import {Form, Button, Icon, Input, Col} from 'antd';
+import {Form, Button, Icon, Input, Col, Alert} from 'antd';
+import PropTypes from 'prop-types';
 import './CfgInput.css';
 const FormItem = Form.Item;
 
 let cfgId = 0;
 class CfgInput extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            startSymbol: {value: ''},
-        }
-        this.handleSubmit = this.handleSubmit.bind(this);
+    static propTypes = {
+        onSubmit: PropTypes.func,
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                let submitObj = Object.create(null);
+                Object.keys(values).forEach(key => {
+                    if (key !== 'cfg') { // cfg is the private id attribute used in this component
+                        Object.assign(submitObj, {[key]: values[key]});
+                    }
+                });
+                console.log('Received values of form: ', submitObj);
+                if (this.props.onSubmit) {
+                    this.props.onSubmit(submitObj);
+                }
             }
         });
     }
@@ -53,6 +59,10 @@ class CfgInput extends React.Component {
             wrapperCol: {
                 span: 8, offset: 2,
             },
+        };
+        const formItemLayoutFullLength = {
+            labelCol: { span: 0 },
+            wrapperCol: { span: 8, offset: 2 },
         };
         const inputCfgs = getFieldValue('cfg').map((cfg, index) => (
           <FormItem {...formItemLayout} label={`产生式${index + 1}`} key={cfg}>
@@ -94,6 +104,9 @@ class CfgInput extends React.Component {
         ));
         return (
             <Form onSubmit={this.handleSubmit}>
+                <FormItem {...formItemLayoutFullLength}>
+                    <Alert message="请使用空格将文法符号分开" type="info" style={{width: '91.67%'}} showIcon />
+                </FormItem>
                 <FormItem {...formstartSymbolLayout} label="开始符号">
                     {getFieldDecorator('startSymbol', {
                         rules: [{
