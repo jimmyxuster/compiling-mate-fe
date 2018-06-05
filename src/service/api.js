@@ -17,7 +17,7 @@ const request = (method, url, data = null) => {
         if (method !== 'GET' && method !== 'HEAD' && data) {
             option = {
                 ...option,
-                body: JSON.stringify(data),
+                body:  JSON.stringify(data),
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', }
             }
         }
@@ -39,6 +39,10 @@ const request = (method, url, data = null) => {
 class api {
     static parsingSyntaxProcessingOutput() {
         return request('POST', '/syntax/parsingProcessingOutput');
+    }
+
+    static reProcessingOutput(data) {
+        return request('GET', '/lex/reProcessingOutput', data);
     }
 }
 
