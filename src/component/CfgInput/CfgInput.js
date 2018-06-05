@@ -1,0 +1,121 @@
+import React from 'react';
+import {Form, Button, Icon, Input, Col} from 'antd';
+import './CfgInput.css';
+const FormItem = Form.Item;
+
+let cfgId = 0;
+class CfgInput extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            startSymbol: {value: ''},
+        }
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+            }
+        });
+    }
+
+    add = () => {
+        this.props.form.setFieldsValue({ cfg: this.props.form.getFieldValue('cfg').concat(++cfgId) });
+    }
+
+    remove = (cfgIndex) => {
+        const { form } = this.props;
+        const cfgIndexes = form.getFieldValue('cfg');
+        if (cfgIndexes.length === 1) {
+            return;
+        }
+        form.setFieldsValue({
+            cfg: cfgIndexes.filter(key => key !== cfgIndex),
+        });
+    }
+
+    render() {
+        const { getFieldDecorator, getFieldValue } = this.props.form;
+        getFieldDecorator('cfg', {initialValue: [cfgId]})
+        const formstartSymbolLayout = {
+            labelCol: { span: 2 },
+            wrapperCol: { span: 2 },
+        };
+        const formItemLayout = {
+            labelCol: { span: 2 },
+            wrapperCol: { span: 8 },
+        };
+        const formItemLayoutWithOutLabel = {
+            wrapperCol: {
+                span: 8, offset: 2,
+            },
+        };
+        const inputCfgs = getFieldValue('cfg').map((cfg, index) => (
+          <FormItem {...formItemLayout} label={`产生式${index + 1}`} key={cfg}>
+              <Col span={10}>
+                  <FormItem>
+                      {getFieldDecorator(`cfgs[${index}].left`, {
+                          rules: [{
+                              required: true,
+                              message: '请输入产生式',
+                          }],
+                      })(
+                          <Input placeholder=""/>
+                      )}
+                  </FormItem>
+              </Col>
+              <Col span={2}>
+                <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                    <i className="iconfont">&#xe96d;</i>
+                </span>
+              </Col>
+              <Col span={10}>
+                  <FormItem>
+                      {getFieldDecorator(`cfgs[${index}].right`, {
+                          rules: [{
+                              required: true,
+                              message: '请输入产生式',
+                          }],
+                      })(
+                          <Input placeholder=""/>
+                      )}
+                  </FormItem>
+              </Col>
+              <Col span={2}>
+                  {getFieldValue('cfg').length > 1 ? (
+                      <Icon type="close-circle dynamic-delete-button" onClick={() => this.remove(cfg)}/>
+                  ) : null}
+              </Col>
+          </FormItem>
+        ));
+        return (
+            <Form onSubmit={this.handleSubmit}>
+                <FormItem {...formstartSymbolLayout} label="开始符号">
+                    {getFieldDecorator('startSymbol', {
+                        rules: [{
+                            required: true,
+                            message: '请输入开始符号',
+                        }],
+                    })(
+                        <Input placeholder=""/>
+                    )}
+                </FormItem>
+                {inputCfgs}
+                <FormItem {...formItemLayoutWithOutLabel}>
+                    <Button type="dashed" onClick={this.add} style={{width: '91.67%'}}>
+                        <Icon type="plus"/> 增加一行
+                    </Button>
+                </FormItem>
+                <FormItem {...formItemLayoutWithOutLabel}>
+                    <Button type="primary" htmlType="submit">提交</Button>
+                </FormItem>
+            </Form>
+        )
+    }
+}
+
+export default Form.create()(CfgInput);

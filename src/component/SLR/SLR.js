@@ -1,6 +1,7 @@
 import React from 'react'
-import {Row, Col, Button, Icon, Table, Steps, Switch} from 'antd'
+import {Row, Col, Button, Icon, Table, Steps, Switch, message} from 'antd'
 import NodeChart from '../NodeChart/NodeChart'
+import CfgInput from '../CfgInput/CfgInput'
 import api from '../../service/api'
 import {calcNodePositions, parseNodeStates} from '../../common/util'
 import './SLR.css'
@@ -23,7 +24,7 @@ class SLR extends React.Component {
             nonTerminals: [],
             parseTable: [],
             tableDisplay: [],
-            currentStep: 1,
+            currentStep: 0,
             directMode: false,
         }
 
@@ -50,7 +51,7 @@ class SLR extends React.Component {
                 this.parseGraphData(res.data.treeSteps)
                 this.parseTable(res.data.symbols, res.data.parseTable)
             }
-        })
+        }).catch(() => message.error('网络异常'))
     }
 
     parseGraphData(treeSteps = []) {
@@ -155,77 +156,83 @@ class SLR extends React.Component {
     }
 
     render() {
+        const step1 = <CfgInput/>;
+        const step2 = (
+            <Row>
+                <Col span={12} className="slr__col">
+                    {this.state.focusNode ? (
+                        <div>
+                            <Button className="slr_detail-button" ghost={true}
+                                    onClick={this.handleCloseDetail}><Icon
+                                type="left"/>返回</Button>
+                            <div className="slr__detail">
+                                <div className="slr__detail-node-wrapper">
+                                    <div className="slr__detail-node">{this.state.focusNode.text}</div>
+                                </div>
+                                <div className="slr__detail-prod">
+                                    {this.state.focusNode.production[0].map((prodLeft, index) =>
+                                        <div key={`prod-${index}`}>
+                                            <span>{prodLeft}</span>→<span>{this.state.focusNode.production[1][index]}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+                    <div style={{display: this.state.focusNode ? 'none' : 'block', position: 'relative'}}>
+                        <NodeChart data={this.state.currData} links={this.state.currLinks} directMode={this.state.directMode}
+                                   onClick={this.handleChartItemClick}/>
+                        <div className="slr__operate-wrapper">
+                            <Button.Group size="medium" className="slr__operate">
+                                <Button type="primary" disabled={this.state.stepCount <= 0} onClick={this.backward}>
+                                    <Icon type="left"/>上一步
+                                </Button>
+                                <Button type="primary" disabled={this.state.stepCount >= this.state.totalStep - 1}
+                                        onClick={this.forward}>
+                                    下一步<Icon type="right"/>
+                                </Button>
+                            </Button.Group>
+                        </div>
+                    </div>
+                </Col>
+                <Col span={12} className="slr__col">
+                    <Table dataSource={this.state.tableDisplay} defaultExpandAllRows={true} pagination={false}>
+                        <ColumnGroup title="Action Table">
+                            {this.state.terminals.map(t => (
+                                <Column
+                                    align="center"
+                                    title={t}
+                                    dataIndex={t}
+                                    key={t}
+                                />
+                            ))}
+                        </ColumnGroup>
+                        <ColumnGroup title="Goto Table">
+                            {this.state.nonTerminals.map(nt => (
+                                <Column
+                                    align="center"
+                                    title={nt}
+                                    dataIndex={nt}
+                                    key={nt}
+                                />
+                            ))}
+                        </ColumnGroup>
+                    </Table>
+                </Col>
+            </Row>
+        );
         return (
             <div className="slr">
-                <div className="slr__toggle">
-                    显示全部产生式：<Switch onChange={this.handleDirectMode}/>
-                </div>
+                {this.state.currentStep === 1 ? (
+                    <div className="slr__toggle">
+                        显示全部产生式：<Switch onChange={this.handleDirectMode}/>
+                    </div>
+                ):null}
                 <Steps current={this.state.currentStep} size="small" className="slr__progress">
                     <Step key="input" title="输入CFG"/>
                     <Step key="compute" title="演示"/>
                 </Steps>
-                <Row>
-                    <Col span={12} className="slr__col">
-                        {this.state.focusNode ? (
-                            <div>
-                                <Button className="slr_detail-button" ghost={true}
-                                        onClick={this.handleCloseDetail}><Icon
-                                    type="left"/>返回</Button>
-                                <div className="slr__detail">
-                                    <div className="slr__detail-node-wrapper">
-                                        <div className="slr__detail-node">{this.state.focusNode.text}</div>
-                                    </div>
-                                    <div className="slr__detail-prod">
-                                        {this.state.focusNode.production[0].map((prodLeft, index) =>
-                                            <div key={`prod-${index}`}>
-                                                <span>{prodLeft}</span>→<span>{this.state.focusNode.production[1][index]}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ) : null}
-                        <div style={{display: this.state.focusNode ? 'none' : 'block', position: 'relative'}}>
-                            <NodeChart data={this.state.currData} links={this.state.currLinks} directMode={this.state.directMode}
-                                       onClick={this.handleChartItemClick}/>
-                            <div className="slr__operate-wrapper">
-                                <Button.Group size="medium" className="slr__operate">
-                                    <Button type="primary" disabled={this.state.stepCount <= 0} onClick={this.backward}>
-                                        <Icon type="left"/>上一步
-                                    </Button>
-                                    <Button type="primary" disabled={this.state.stepCount >= this.state.totalStep - 1}
-                                            onClick={this.forward}>
-                                        下一步<Icon type="right"/>
-                                    </Button>
-                                </Button.Group>
-                            </div>
-                        </div>
-                    </Col>
-                    <Col span={12} className="slr__col">
-                        <Table dataSource={this.state.tableDisplay} defaultExpandAllRows={true} pagination={false}>
-                            <ColumnGroup title="Action Table">
-                                {this.state.terminals.map(t => (
-                                    <Column
-                                        align="center"
-                                        title={t}
-                                        dataIndex={t}
-                                        key={t}
-                                    />
-                                ))}
-                            </ColumnGroup>
-                            <ColumnGroup title="Goto Table">
-                                {this.state.nonTerminals.map(nt => (
-                                    <Column
-                                        align="center"
-                                        title={nt}
-                                        dataIndex={nt}
-                                        key={nt}
-                                    />
-                                ))}
-                            </ColumnGroup>
-                        </Table>
-                    </Col>
-                </Row>
+                {this.state.currentStep === 0 ? step1 : step2}
             </div>
         )
     }
