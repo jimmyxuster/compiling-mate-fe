@@ -67,6 +67,7 @@ class ReTree extends Component {
           }; 
           treeChart.setOption(treeOption); 
     }
+    
     render() {
         return (
             <div id="re_tree" style={{height: 500}}/>

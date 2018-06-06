@@ -1,4 +1,5 @@
 {
   "lex": "<b>Lexical Analyzer</b>(词法分析器) is the first phase of a compiler, it reads the source program character by character to produce <span class='emphasis'>tokens</span> for syntax analysis.",
-  "syntax": "<b>Syntax Analyzer (语法分析器) creates the syntactic structure, and is also known as <span class='emphasis'>parser</span>, who checks whether a given source program satisfies the rules implied by a <span class='emphasis'>context-free grammar</span> or not."
+  "syntax": "<b>Syntax Analyzer</b> (语法分析器) creates the syntactic structure, and is also known as <span class='emphasis'>parser</span>, who checks whether a given source program satisfies the rules implied by a <span class='emphasis'>context-free grammar</span> or not.",
+  "semantic": "<b>Semantic Analyzer</b>（语义分析器） is to gather necessary semantic information from the source code to produce intermediate code."
 }

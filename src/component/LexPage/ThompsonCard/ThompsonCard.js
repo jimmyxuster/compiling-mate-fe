@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
 import {Card, Row, Col} from 'antd';
-import * as echarts from 'echarts';
 import NfaGraph from '../NfaGraph/NfaGraph';
 import ReTree from '../ReTree/ReTree';
 import './ThompsonCard.css';
-
-import {mockTreeData, mockGraphData} from './MockData';
 
 class ThompsonCard extends Component {
 

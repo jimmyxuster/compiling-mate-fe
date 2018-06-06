@@ -9,6 +9,7 @@ import { Spin } from 'antd';
 import ECharts from 'echarts';
 import mainGraph from './main';
 import lexGraph from './lex';
+import sematicGraph from './semantic';
 import descriptions from './description';
 
 const FLAG_BACK = -2;
@@ -29,6 +30,7 @@ class ConceptTree extends React.Component {
         };
         this.descChartData = {
             lex: lexGraph,
+            semantic: sematicGraph,
         }
         this.option = {
             title: {
@@ -360,6 +362,7 @@ class ConceptTree extends React.Component {
             showDescription: false,
             description: '',
             showMainButton: false,
+            title: '编译器',
         })
     }
 
