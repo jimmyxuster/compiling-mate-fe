@@ -20,15 +20,16 @@ class LexPage extends Component {
             re: "",
             lastRe: "",
             currentAlgorithm: "",
-            shouldShowReEmptyError: false,
             isLoading: false,
-            data: {}
+            data: {},
+            errorMsg: ''
         }
     }
 
     onChange = (e) => {
         const {value} = e.target;
-        this.setState({re: value, shouldShowReEmptyError: false});
+        this.setState({re: value});
+        this.handleClose();
     }
 
     getParsingData = () => {
@@ -39,17 +40,25 @@ class LexPage extends Component {
         });
 
         api.reProcessingOutput({input: this.state.re, ruleName: this.state.re}).then(res => {
-            console.log(res);
-            this.setState({
-                isLoading: false,
-                data: res.data
-            })
+            if(res.success){
+                this.setState({
+                    isLoading: false,
+                    data: res.data
+                })
+            } else {
+                this.setState({
+                    isLoading:false,
+                    errorMsg: 'Error: ' + res.msg
+                })
+            }
+            
+            
         })
     }
 
     onClickAlgorithm = (algorithm) => {
         if(this.state.re === "") {
-            this.setState({shouldShowReEmptyError: true});
+            this.setState({errorMsg: 'Error: RE不能为空'});
             return;
         }
         this.setState({currentAlgorithm: algorithm});
@@ -66,7 +75,7 @@ class LexPage extends Component {
     }
 
     handleClose = () => {
-        this.setState({shouldShowReEmptyError: false});
+        this.setState({errorMsg: ''});
     }
 
     render() {
@@ -116,8 +125,8 @@ class LexPage extends Component {
                         RE to DFA
                     </Button>
 
-                    {this.state.shouldShowReEmptyError
-                        ? (<Alert message="RE不能为空" type="error" closable afterClose={this.handleClose}/>)
+                    {this.state.errorMsg !== ''
+                        ? (<Alert message={this.state.errorMsg} type="error" closable afterClose={this.handleClose}/>)
                         : null
                     }
                 </div>
