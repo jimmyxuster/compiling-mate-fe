@@ -27,7 +27,9 @@
   },
   "devDependencies": {
     "babel-plugin-import": "^1.7.0",
+    "classnames": "^2.2.5",
     "node-mock-server": "^0.23.1",
+    "prop-types": "^15.6.1",
     "react-app-rewired": "^1.5.2"
   },
   "proxy": {

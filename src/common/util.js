@@ -31,7 +31,7 @@ function parseNodeStates(treeSteps) {
             case 'add':
                 newState = {
                     data: [...oldNodes, ...parseNodeFromStepAdd(step, oldNodes)],
-                    links: [...oldLinks, ...parseLinkFromStepAdd(step)]
+                    links: [...oldLinks, ...parseLinkFromStepAdd(step)],
                 };
                 states.push(newState);
                 break;
@@ -73,7 +73,7 @@ function parseProduction(arr) {
         result += arr[0][i];
         result += '→';
         result += arr[1][i];
-        result += '<br />';
+        result += '\n';
     }
     return result;
 }
