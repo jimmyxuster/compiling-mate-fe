@@ -4,6 +4,7 @@ import './App.css'
 import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
 import ConceptTree from './component/ConceptTree/ConceptTree'
 import LeftRightLayout from './component/LeftRightLayout/LeftRightLayout'
+import LexPage from './component/LexPage/LexPage';
 
 const {Header} = Layout
 
@@ -46,6 +47,7 @@ class App extends Component {
                     <Route path="/" exact component={ConceptTree}/>
                     <Route path="/concepts" component={ConceptTree}/>
                     <Route path="/algorithm" component={LeftRightLayout}/>
+                    <Route path="/lex" component={LexPage}/>
                 </Layout>
             </Router>
         )
