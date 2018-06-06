@@ -11,6 +11,7 @@ import ThompsonCard from './ThompsonCard/ThompsonCard';
 import NfaToDfaCard from './NfaToDfaCard/NfaToDfaCard';
 import ReToDfaCard from './ReToDfaCard/ReToDfaCard';
 import './LexPage.css';
+import api from '../../service/api';
 
 class LexPage extends Component {
     constructor(props) {
@@ -19,15 +20,16 @@ class LexPage extends Component {
             re: "",
             lastRe: "",
             currentAlgorithm: "",
-            shouldShowReEmptyError: false,
             isLoading: false,
-            data: {}
+            data: {},
+            errorMsg: ''
         }
     }
 
     onChange = (e) => {
         const {value} = e.target;
-        this.setState({re: value, shouldShowReEmptyError: false});
+        this.setState({re: value});
+        this.handleClose();
     }
 
     getParsingData = () => {
@@ -37,19 +39,26 @@ class LexPage extends Component {
             lastRe: re
         });
 
-        let callback = () => {
-            this.setState({
-                data: {thompsonData: "test"},
-                isLoading: false
-            });
-        }
-
-        setTimeout(callback, 1000);
+        api.reProcessingOutput({input: this.state.re, ruleName: this.state.re}).then(res => {
+            if(res.success){
+                this.setState({
+                    isLoading: false,
+                    data: res.data
+                })
+            } else {
+                this.setState({
+                    isLoading:false,
+                    errorMsg: 'Error: ' + res.msg
+                })
+            }
+            
+            
+        })
     }
 
     onClickAlgorithm = (algorithm) => {
         if(this.state.re === "") {
-            this.setState({shouldShowReEmptyError: true});
+            this.setState({errorMsg: 'Error: RE不能为空'});
             return;
         }
         this.setState({currentAlgorithm: algorithm});
@@ -66,20 +75,23 @@ class LexPage extends Component {
     }
 
     handleClose = () => {
-        this.setState({shouldShowReEmptyError: false});
+        this.setState({errorMsg: ''});
     }
 
     render() {
+        let { tompsonData } = this.state.data;
         const loadingIcon = <Icon type="loading" style={{
             fontSize: 36
         }} spin/>;
 
         const cardMap = {
-            thompson: <ThompsonCard/>,
+            thompson: <ThompsonCard data={tompsonData}/>,
             nfaToDfa: <NfaToDfaCard/>,
             reToDfa: <ReToDfaCard/>
         };
         let currentCard = cardMap[this.state.currentAlgorithm];
+
+        
 
         return (
             <div className="lex-page-container">
@@ -113,8 +125,8 @@ class LexPage extends Component {
                         RE to DFA
                     </Button>
 
-                    {this.state.shouldShowReEmptyError
-                        ? (<Alert message="RE不能为空" type="error" closable afterClose={this.handleClose}/>)
+                    {this.state.errorMsg !== ''
+                        ? (<Alert message={this.state.errorMsg} type="error" closable afterClose={this.handleClose}/>)
                         : null
                     }
                 </div>

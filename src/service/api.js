@@ -15,10 +15,19 @@ const request = (method, url, data = null) => {
             method,
         };
         if (method !== 'GET' && method !== 'HEAD' && data) {
+            // option = {
+            //     ...option,
+            //     body:  JSON.stringify(data),
+            //     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', }
+            // }
+            let body = '';
+            let paramsArray = [];
+            Object.keys(data).forEach(key => paramsArray.push(key + '=' + data[key]));
+            body += paramsArray.join('&');
             option = {
                 ...option,
-                body: JSON.stringify(data),
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', }
+                body:  body,
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded', }
             }
         }
         fetch(baseUrl + url, option).then(response => {
@@ -39,6 +48,10 @@ const request = (method, url, data = null) => {
 class api {
     static parsingSyntaxProcessingOutput() {
         return request('POST', '/syntax/parsingProcessingOutput');
+    }
+
+    static reProcessingOutput(data) {
+        return request('POST', '/lex/reProcessingOutput', data);
     }
 }
 
