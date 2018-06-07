@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as echarts from 'echarts';
 
+// TODO:  refactor nfaChart
 function culPosition (data) {
   let res = {
     nodes: data.nodes,
@@ -105,12 +106,9 @@ function culPosition (data) {
   return res;
 }
 
-let nfaChart;
 class NfaGraph extends Component {
   componentDidMount () {
-    nfaChart = echarts.init (document.getElementById ('nfa_graph'));
-    let option = {};
-    nfaChart.setOption (option);
+    this.nfaChart = echarts.init (document.getElementById ('nfa_graph'));
   }
 
   render () {
@@ -122,8 +120,8 @@ class NfaGraph extends Component {
       links = data.links;
       nodes = data.nodes;
     }
-    if (nfaChart !== undefined) {
-      nfaChart.setOption ({
+    if (this.nfaChart !== undefined) {
+      this.nfaChart.setOption ({
         title: {
           text: 'NFA图',
         },
