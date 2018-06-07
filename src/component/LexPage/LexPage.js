@@ -90,9 +90,7 @@ class LexPage extends Component {
             reToDfa: <ReToDfaCard/>
         };
         let currentCard = cardMap[this.state.currentAlgorithm];
-
         
-
         return (
             <div className="lex-page-container">
                 <div className="input-container">

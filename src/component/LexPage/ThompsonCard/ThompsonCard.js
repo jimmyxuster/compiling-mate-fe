@@ -5,45 +5,51 @@ import ReTree from '../ReTree/ReTree';
 import './ThompsonCard.css';
 
 class ThompsonCard extends Component {
-
-  constructor() {
-    super();
+  constructor () {
+    super ();
     this.state = {
-      currentId: null
-    }
-  }
-  componentDidMount() {
-
+      currentId: null,
+    };
   }
 
-  render() {
+  setCurrentId = id => {
+    this.setState ({
+      currentId: id,
+    });
+  };
+
+  render () {
     let nfaMap = {};
     let reTree = {};
     let data = this.props.data;
-    if(data !== undefined){
+    if (data !== undefined) {
       nfaMap = data.nfaMap;
       reTree = data.reTree;
     }
     let currentId = this.state.currentId;
-    let currentGraphData = {nodes:[], links:[]};
-    if(nfaMap !== {}) {
+    let currentGraphData = {nodes: [], links: []};
+    if (nfaMap !== {}) {
       currentGraphData = nfaMap[reTree.id];
     }
-    if(currentId !== null) {
+    if (currentId !== null) {
       currentGraphData = nfaMap[currentId];
     }
     return (
-      <Card className="thompson-card" title="Thompson Algorithm" bordered={false}>
+      <Card
+        className="thompson-card"
+        title="Thompson Algorithm"
+        bordered={false}
+      >
         <Row gutter={16}>
           <Col span={8}>
-            <ReTree data={[]} />
+            <ReTree data={reTree} setCurrentId={this.setCurrentId}/>
           </Col>
           <Col span={16}>
             <NfaGraph data={currentGraphData} />
           </Col>
         </Row>
       </Card>
-    )
+    );
   }
 }
 
