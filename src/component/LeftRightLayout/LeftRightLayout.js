@@ -67,7 +67,7 @@ class LeftRightLayout extends React.Component {
                     </Menu>
                 </Sider>
                 <Layout className="lr__content" style={{ padding: '24px 24px' }}>
-                    <Content style={{ background: '#fff', padding: '12px 12px', margin: 0, height: '100%' }}>
+                    <Content style={{ background: '#fff', padding: '12px 12px', margin: 0, height: '100%', overflow: 'auto' }}>
                         <Route path="/algorithm/ll1" component={LL1} />
                         <Route path="/algorithm/slr" component={SLR} />
                         <Route path="/algorithm/lex" component={LexPage} />

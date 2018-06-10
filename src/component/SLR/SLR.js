@@ -35,23 +35,25 @@ class SLR extends React.Component {
         this.handleDirectMode = this.handleDirectMode.bind(this)
     }
 
-    componentDidMount() {
-        this.fetchSolution()
-    }
-
-    componentWillReceiveProps(newProps) {
-        if ('cfg' in newProps) {
-            this.fetchSolution(newProps.cfg)
+    fetchSolution(cfgs = [], startSymbol) {
+        const data = {
+            startSymbol,
+            productions: cfgs,
         }
-    }
-
-    fetchSolution(cfg = []) {
-        api.parsingSyntaxProcessingOutput(cfg).then(res => {
-            if (res.code === 0) {
-                this.parseGraphData(res.data.treeSteps)
-                this.parseTable(res.data.symbols, res.data.parseTable)
+        api.parsingSyntaxProcessingOutput(data).then(res => {
+            if (res.success) {
+                this.setState({currentStep: 1});
+                setTimeout(() => {
+                    this.parseGraphData(res.data.treeSteps);
+                    this.parseTable(res.data.symbols, res.data.parseTable.table);
+                }, 0);
+            } else {
+                message.error('输入不合法：' + res.message);
             }
-        }).catch(() => message.error('网络异常'))
+        }).catch((err) => {
+            message.error('网络异常')
+            console.log(err)
+        })
     }
 
     parseGraphData(treeSteps = []) {
@@ -155,8 +157,13 @@ class SLR extends React.Component {
         });
     }
 
+    handleSubmit = (submitObj) => {
+        console.log(submitObj)
+        this.fetchSolution(submitObj.cfgs, submitObj.startSymbol);
+    }
+
     render() {
-        const step1 = <CfgInput/>;
+        const step1 = <CfgInput onSubmit={this.handleSubmit}/>;
         const step2 = (
             <Row>
                 <Col span={12} className="slr__col">
@@ -170,9 +177,9 @@ class SLR extends React.Component {
                                     <div className="slr__detail-node">{this.state.focusNode.text}</div>
                                 </div>
                                 <div className="slr__detail-prod">
-                                    {this.state.focusNode.production[0].map((prodLeft, index) =>
+                                    {this.state.focusNode.production.productionLeft.map((prodLeft, index) =>
                                         <div key={`prod-${index}`}>
-                                            <span>{prodLeft}</span>→<span>{this.state.focusNode.production[1][index]}</span>
+                                            <span>{prodLeft}</span>→<span>{this.state.focusNode.production.productionRight[index]}</span>
                                         </div>
                                     )}
                                 </div>
