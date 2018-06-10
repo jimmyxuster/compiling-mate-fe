@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Layout } from 'antd';
 import { Route, Link } from 'react-router-dom';
+import LL1 from '../LL/LL';
 import SLR from '../SLR/SLR'
 import menuConfig from '../../common/menu-config';
 import LexPage from '../LexPage/LexPage';
@@ -66,7 +67,8 @@ class LeftRightLayout extends React.Component {
                     </Menu>
                 </Sider>
                 <Layout className="lr__content" style={{ padding: '24px 24px' }}>
-                    <Content style={{ background: '#fff', margin: 0, height: '100%' }}>
+                    <Content style={{ background: '#fff', padding: '12px 12px', margin: 0, height: '100%' }}>
+                        <Route path="/algorithm/ll1" component={LL1} />
                         <Route path="/algorithm/slr" component={SLR} />
                         <Route path="/algorithm/lex" component={LexPage} />
                     </Content>

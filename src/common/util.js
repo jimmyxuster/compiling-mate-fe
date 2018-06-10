@@ -78,4 +78,20 @@ function parseProduction(arr) {
     return result;
 }
 
-export {parseNodeStates, calcNodePositions};
+function handleEpsilon(input) {
+    if (input instanceof Array) {
+        return input.map(str => str.replace('epsilon', 'ε'));
+    } else {
+        let result = Object.create(null);
+        Object.keys(input).forEach(key => {
+            if (typeof input[key] === 'string') {
+                Object.assign(result, {[key]: input[key].replace('epsilon', 'ε')});
+            } else {
+                Object.assign(result, {[key]: handleEpsilon(input[key])});
+            }
+        })
+        return result;
+    }
+}
+
+export {parseNodeStates, calcNodePositions, handleEpsilon};

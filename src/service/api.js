@@ -50,6 +50,10 @@ class api {
         return request('POST', '/syntax/parsingProcessingOutput');
     }
 
+    static parsingLL1Output() {
+        return request('POST', '/syntax/parsingLL1Output');
+    }
+
     static reProcessingOutput(data) {
         return request('POST', '/lex/reProcessingOutput', data);
     }
