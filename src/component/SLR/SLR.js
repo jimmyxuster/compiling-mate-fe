@@ -39,6 +39,7 @@ class SLR extends React.Component {
         const data = {
             startSymbol,
             productions: cfgs,
+            type: 0,
         }
         api.parsingSyntaxProcessingOutput(data).then(res => {
             if (res.success) {
