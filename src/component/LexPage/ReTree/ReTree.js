@@ -90,7 +90,7 @@ class ReTree extends Component {
   }
 }
 
-ReTree.defualtProps = {
+ReTree.defaultProps = {
   data: null,
 };
 
