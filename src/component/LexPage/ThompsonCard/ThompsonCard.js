@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Card, Row, Col} from 'antd';
 import NfaGraph from '../NfaGraph/NfaGraph';
 import ReTree from '../ReTree/ReTree';
-import './ThompsonCard.css';
 
 class ThompsonCard extends Component {
   constructor () {
