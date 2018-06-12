@@ -75,15 +75,15 @@ class ConceptTree extends React.Component {
                 }
             ]
         };
-        this.animate = this.animate.bind(this);
-        this.onResize = this.onResize.bind(this);
+        // this.animate = this.animate.bind(this);
+        // this.onResize = this.onResize.bind(this);
         this.handleExpand = this.handleExpand.bind(this);
         this.handleMainPage = this.handleMainPage.bind(this);
     }
 
     componentDidMount() {
         setTimeout(() => {
-            this.initThree();
+            // this.initThree();
             this.setState({loading: false});
             this.chart = ECharts.init(this.refs['echart']);
             this.chart.setOption(this.option);
@@ -124,24 +124,24 @@ class ConceptTree extends React.Component {
         window.addEventListener('resize', this.onResize, false);
     }
 
-    onResize() {
-        let {width, height} = this.getContainerRect();
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);
-    }
+    // onResize() {
+    //     let {width, height} = this.getContainerRect();
+    //     this.camera.aspect = width / height;
+    //     this.camera.updateProjectionMatrix();
+    //     this.renderer.setSize(width, height);
+    // }
 
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.onResize);
-    }
+    // componentWillUnmount() {
+    //     window.removeEventListener('resize', this.onResize);
+    // }
 
-    animate() {
-        if (this.state.isRunning) {
-            this.renderer.render(this.scene, this.camera);
-            requestAnimationFrame(this.animate);
-            TWEEN.update();
-        }
-    }
+    // animate() {
+    //     if (this.state.isRunning) {
+    //         this.renderer.render(this.scene, this.camera);
+    //         requestAnimationFrame(this.animate);
+    //         TWEEN.update();
+    //     }
+    // }
 
     handleExpand() {
         if (!this.state.expanded) {
