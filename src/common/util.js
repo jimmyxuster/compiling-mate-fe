@@ -3,7 +3,7 @@ function parseNodeFromStepAdd(step, nodes) {
     do {
         conflictNode = nodes.find(node => node.name === name);
         if (conflictNode) {
-            name = step.node.text + "'";
+            name = name + "'";
         }
     } while (conflictNode);
     step.node.text = name;
