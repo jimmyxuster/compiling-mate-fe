@@ -29,7 +29,7 @@ class App extends Component {
             <Router>
                 <Layout className="app">
                     <Header className="header">
-                        <div className="header-logo">Compilers</div>
+                        <div className="header-logo">COCO</div>
                         <Menu
                             theme="dark"
                             mode="horizontal"
@@ -41,6 +41,7 @@ class App extends Component {
                             <Menu.Item key="/concepts"><Link to="/concepts">知识图谱</Link></Menu.Item>
                             <Menu.Item key="/algorithm"><Link to="/algorithm">算法演示</Link></Menu.Item>
                             <Menu.Item key="/colang"><Link to="/colang">Co语言</Link></Menu.Item>
+                            <Menu.Item key="/about"><Link to="/about">关于</Link></Menu.Item>
                         </Menu>
                     </Header>
                     <Route path="/" exact component={ConceptTree}/>
