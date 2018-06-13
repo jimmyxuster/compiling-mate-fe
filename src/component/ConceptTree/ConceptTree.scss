@@ -3,6 +3,8 @@
   position: relative;
   flex-grow: 1;
   overflow: hidden;
+  background: url("/image/nz.jpg");
+  background-size: 100% 100%;
   .concept-three__loading {
     background-color: white;
     display: flex;
