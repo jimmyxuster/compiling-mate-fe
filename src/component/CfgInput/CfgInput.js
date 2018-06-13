@@ -21,7 +21,6 @@ class CfgInput extends React.Component {
                         Object.assign(submitObj, {[key]: values[key]});
                     }
                 });
-                console.log('Received values of form: ', submitObj);
                 if (this.props.onSubmit) {
                     this.props.onSubmit(submitObj);
                 }
