@@ -36,7 +36,7 @@ class CoLangPage extends Component {
     return (
       <div className="colang-page-container">
         <Row gutter={16}>
-          <Col span={6}>
+          <Col span={6} offset={3}>
             <Card title="Code Editor" bordered={false}>
               <TextArea
                 placeholder="Enter your colang code here"
