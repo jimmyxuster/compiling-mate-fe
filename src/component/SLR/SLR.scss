@@ -21,6 +21,24 @@ $node-width: 60px;
       border-color: #fff;
     }
   }
+  .slr__cell {
+    position: relative;
+  }
+  .slr__conflict-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #F56C6C;
+    .slr__conflict {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+    }
+  }
   .slr__operate-wrapper {
     position: absolute;
     bottom: 4px;

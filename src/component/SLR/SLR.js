@@ -26,6 +26,7 @@ class SLR extends React.Component {
             tableDisplay: [],
             currentStep: 0,
             directMode: false,
+            conflicts: [],
         }
 
         this.backward = this.backward.bind(this)
@@ -47,6 +48,7 @@ class SLR extends React.Component {
                 setTimeout(() => {
                     this.parseGraphData(res.data.treeSteps);
                     this.parseTable(res.data.symbols, res.data.parseTable.table);
+                    this.parseTableConflicts(res.data.parseTable);
                 }, 0);
             } else {
                 message.error('输入不合法：' + res.message);
@@ -93,9 +95,13 @@ class SLR extends React.Component {
         this.setState({
             parseTable: table,
             terminals,
-            nonTerminals
+            nonTerminals,
         })
         this.refreshParseTable(0)
+    }
+
+    parseTableConflicts({conflictList}) {
+        this.setState({conflicts: conflictList});
     }
 
     refreshParseTable(stepCount) {
@@ -163,6 +169,16 @@ class SLR extends React.Component {
         this.fetchSolution(submitObj.cfgs, submitObj.startSymbol);
     }
 
+    renderCell = (text, rowIndex, colIndex) => {
+        let conflict = this.state.conflicts.find((conflict) => conflict.row === rowIndex && conflict.col === colIndex - 1);
+        if (conflict && this.state.stepCount === this.state.totalStep - 1) {
+            const conflicts = [text, ...conflict.content];
+            return <div className="slr__conflict-wrapper"><span className="slr__conflict">{conflicts.join(', ')}</span></div>;
+        } else {
+            return <span>{text}</span>;
+        }
+    }
+
     render() {
         const step1 = <CfgInput onSubmit={this.handleSubmit}/>;
         const step2 = (
@@ -206,12 +222,14 @@ class SLR extends React.Component {
                 <Col span={12} className="slr__col">
                     <Table dataSource={this.state.tableDisplay} defaultExpandAllRows={true} pagination={false}>
                         <ColumnGroup title="Action Table">
-                            {this.state.terminals.map(t => (
+                            {this.state.terminals.map((t, colIndex) => (
                                 <Column
+                                    className="slr__cell"
                                     align="center"
                                     title={t}
                                     dataIndex={t}
                                     key={t}
+                                    render={(text, record, rowIndex) => this.renderCell(text, rowIndex, colIndex)}
                                 />
                             ))}
                         </ColumnGroup>
