@@ -6,6 +6,8 @@ import ConceptTree from './component/ConceptTree/ConceptTree'
 import LeftRightLayout from './component/LeftRightLayout/LeftRightLayout'
 import LexPage from './component/LexPage/LexPage';
 import CoLangPage from './component/CoLang/CoLangPage';
+import AboutPage from './component/AboutPage/AboutPage';
+import Logo from './img/logo.jpg';
 const {Header} = Layout
 
 class App extends Component {
@@ -29,7 +31,7 @@ class App extends Component {
             <Router>
                 <Layout className="app">
                     <Header className="header">
-                        <div className="header-logo">COCO</div>
+                        <div className="header-logo"><img className="logo" src={Logo} /></div>
                         <Menu
                             theme="dark"
                             mode="horizontal"
@@ -49,6 +51,7 @@ class App extends Component {
                     <Route path="/algorithm" component={LeftRightLayout}/>
                     <Route path="/lex" component={LexPage}/>
                     <Route path="/colang" component={CoLangPage}/>
+                    <Route path="/about" component={AboutPage}/>
                 </Layout>
             </Router>
         )

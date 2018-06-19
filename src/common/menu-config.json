@@ -3,6 +3,6 @@
     {"name": "LL(1)", "to": "/algorithm/ll1"},
     {"name": "SLR", "to": "/algorithm/slr"},
     {"name": "LALR", "to": "/algorithm/lalr"},
-    {"name": "LEX", "to": "/algorithm/lex"}
+    {"name": "词法分析器三大算法", "to": "/algorithm/lex"}
   ]
 }

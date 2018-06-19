@@ -5,11 +5,16 @@
   flex-direction: column;
 }
 .header-logo {
-  width: 120px;
-  height: 31px;
+  width: 50px;
+  height: 50px;
   float: left;
   color: white;
   font-size: 20px;
+  margin: 0 24px 0 0;
+  .logo {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 @keyframes App-logo-spin {
