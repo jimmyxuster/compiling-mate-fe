@@ -5,6 +5,7 @@ import LL1 from '../LL/LL';
 import SLR from '../SLR/SLR'
 import menuConfig from '../../common/menu-config';
 import LexPage from '../LexPage/LexPage';
+import LR from '../LR/LR';
 
 const { Sider, Content } = Layout;
 
@@ -70,6 +71,7 @@ class LeftRightLayout extends React.Component {
                     <Content style={{ background: '#fff', padding: '12px 12px', margin: 0, height: '100%', overflow: 'auto' }}>
                         <Route path="/algorithm/ll1" component={LL1} />
                         <Route path="/algorithm/slr" component={SLR} />
+                        <Route path="/algorithm/lr" component={LR} />
                         <Route path="/algorithm/lex" component={LexPage} />
                     </Content>
                 </Layout>

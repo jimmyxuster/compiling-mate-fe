@@ -3,6 +3,6 @@
     {"name": "词法分析三大算法", "to": "/algorithm/lex"},
     {"name": "语法分析LL(1)", "to": "/algorithm/ll1"},
     {"name": "语法分析SLR", "to": "/algorithm/slr"},
-    {"name": "语法分析LALR", "to": "/algorithm/lalr"}
+    {"name": "语法分析LALR", "to": "/algorithm/lr"}
   ]
 }
