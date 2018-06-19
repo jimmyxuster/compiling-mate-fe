@@ -5,6 +5,7 @@ import {handleEpsilon} from '../../common/util'
 import CfgInput from '../CfgInput/CfgInput'
 import api from '../../service/api'
 import './LL.css'
+import {message} from 'antd/lib/index'
 
 const {Step} = Steps
 const {Column, ColumnGroup} = Table
@@ -15,7 +16,7 @@ class LL extends React.Component {
         super(props)
         this.state = {
             parseTable: [],
-            currentStep: 1,
+            currentStep: 0,
             totalStep: 0,
             tableStep: 0,
             terminals: [],
@@ -26,20 +27,21 @@ class LL extends React.Component {
         }
     }
 
-    componentDidMount() {
-        api.parsingLL1Output().then(res => {
-            if (res.code === 0) {
+    handleSubmit = (submitObj) => {
+        api.parsingLL1Output({startSymbol: submitObj.startSymbol, productions: submitObj.cfgs, type: 0}).then(res => {
+            if (res.success) {
                 const {nonTerminals, terminals} = res.data
                 const parseTable = res.data.parseTable.map((row, index) => {
                     let obj = Object.create(null)
                     Object.assign(obj, {nonTerminal: nonTerminals[index], key: nonTerminals[index]})
                     row.forEach((item, index) => {
-                        item.production = handleEpsilon(item.production);
+                        item.production = item.production ? handleEpsilon(item.production) : null;
                         Object.assign(obj, {[terminals[index]]: item})
                     })
                     return obj
                 })
                 this.setState({
+                    currentStep: 1,
                     parseTable,
                     nonTerminals,
                     terminals,
@@ -47,8 +49,12 @@ class LL extends React.Component {
                     follows: handleEpsilon(res.data.follows),
                     totalStep: nonTerminals.length * terminals.length,
                 })
+            } else {
+                message.error('输入不合法：' + res.message);
             }
-        })
+        }).catch(() => {
+            message.error('网络异常');
+        });
     }
 
     handleCellClick(rowIndex, colIndex) {
@@ -84,7 +90,9 @@ class LL extends React.Component {
         let highlightFirsts = [], highlightFollows = [];
         if (row >= 0) {
             const {reason} = this.state.parseTable[row][this.state.terminals[col]];
-            if (reason.type === 'first') {
+            if (reason === undefined) {
+                highlightFirsts = highlightFollows = [];
+            } else if (reason.type === 'first') {
                 highlightFirsts = [reason.key];
             } else if (reason.type === 'follow') {
                 highlightFollows = [reason.key];
@@ -105,16 +113,23 @@ class LL extends React.Component {
     }
 
     getTableCell(data, rowIndex, colIndex) {
-        const classes = classNames({'ll-table__cell': true, 'selected': rowIndex * this.state.terminals.length + colIndex + 1 === this.state.tableStep})
-        return (
-            <div className={classes} onClick={() => this.handleCellClick(rowIndex, colIndex)}><span style={{visibility: this.getColVisibility(rowIndex, colIndex)}}
-            >{data.production.left}<i
-                className="iconfont">&#xe96d;</i>{data.production.right}</span></div>
-        )
+        const classes = classNames({'ll-table__cell': true, 'selected': rowIndex * this.state.terminals.length + colIndex + 1 === this.state.tableStep});
+        if (data.production) {
+            return (
+                <div className={classes} onClick={() => this.handleCellClick(rowIndex, colIndex)}><span
+                    style={{visibility: this.getColVisibility(rowIndex, colIndex)}}
+                >{data.production.left}<i
+                    className="iconfont">&#xe96d;</i>{data.production.right}</span></div>
+            );
+        } else {
+            return (
+                <div className={classes}/>
+            );
+        }
     }
 
     render() {
-        const step1 = CfgInput;
+        const step1 = <CfgInput  onSubmit={this.handleSubmit} />;
         const step2 = (
             <Row>
                 <Col span={12} className="ll__left">

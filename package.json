@@ -34,7 +34,10 @@
   },
   "proxy": {
     "/api": {
-      "target": "http://dev.compiling.cn"
+      "target": "http://118.25.125.33:3900",
+      "pathRewrite": {
+        "^/api": "/"
+      }
     }
   }
 }

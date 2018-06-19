@@ -4,12 +4,12 @@ import NodeChart from '../NodeChart/NodeChart'
 import CfgInput from '../CfgInput/CfgInput'
 import api from '../../service/api'
 import {calcNodePositions, parseNodeStates} from '../../common/util'
-import './SLR.css'
+import './LR.css'
 
 const {Column, ColumnGroup} = Table;
 const {Step} = Steps;
 
-class SLR extends React.Component {
+class LR extends React.Component {
 
     constructor(props) {
         super(props)
@@ -40,7 +40,7 @@ class SLR extends React.Component {
         const data = {
             startSymbol,
             productions: cfgs,
-            type: 0,
+            type: 1,
         }
         api.parsingSyntaxProcessingOutput(data).then(res => {
             if (res.success) {
@@ -264,4 +264,4 @@ class SLR extends React.Component {
     }
 }
 
-export default SLR
+export default LR

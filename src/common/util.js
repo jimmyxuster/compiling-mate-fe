@@ -3,7 +3,7 @@ function parseNodeFromStepAdd(step, nodes) {
     do {
         conflictNode = nodes.find(node => node.name === name);
         if (conflictNode) {
-            name = step.node.text + "'";
+            name = name + "'";
         }
     } while (conflictNode);
     step.node.text = name;
@@ -73,14 +73,16 @@ function calcNodePositions(nodes) {
 }
 
 function parseProduction(node) {
-    if (!('productionLeft' in node) || !('productionRight' in node)) {
+    if (!('productionLeft' in node) || !('productionRight' in node) || !('left' in node) || !('right' in node)) {
         throw new TypeError('productionLeft and productionRight must be attributes of node!');
     }
+    const left = node.productionLeft || node.left;
+    const right = node.productionRight || node.right;
     let result = '';
-    for (let i = 0; i < node.productionLeft.length; i++) {
-        result += node.productionLeft[i];
+    for (let i = 0; i < left.length; i++) {
+        result += left[i];
         result += '→';
-        result += node.productionRight[i];
+        result += right[i];
         result += '\n';
     }
     return result;
