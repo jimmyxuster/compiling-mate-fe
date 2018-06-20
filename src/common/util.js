@@ -73,9 +73,6 @@ function calcNodePositions(nodes) {
 }
 
 function parseProduction(node) {
-    if (!('productionLeft' in node) || !('productionRight' in node) || !('left' in node) || !('right' in node)) {
-        throw new TypeError('productionLeft and productionRight must be attributes of node!');
-    }
     const left = node.productionLeft || node.left;
     const right = node.productionRight || node.right;
     let result = '';
