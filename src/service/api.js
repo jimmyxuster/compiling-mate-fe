@@ -69,6 +69,10 @@ class api {
     static reProcessingOutput(data) {
         return request('POST', '/lex/reProcessingOutput', data)
     }
+
+    static runCoLangCode(data) {
+        return request('POST', '/co/compile', data);
+    }
 }
 
 export default api

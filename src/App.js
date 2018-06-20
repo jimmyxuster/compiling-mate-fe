@@ -5,7 +5,7 @@ import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
 import ConceptTree from './component/ConceptTree/ConceptTree'
 import LeftRightLayout from './component/LeftRightLayout/LeftRightLayout'
 import LexPage from './component/LexPage/LexPage';
-
+import CoLangPage from './component/CoLang/CoLangPage';
 const {Header} = Layout
 
 class App extends Component {
@@ -40,14 +40,14 @@ class App extends Component {
                         >
                             <Menu.Item key="/concepts"><Link to="/concepts">知识图谱</Link></Menu.Item>
                             <Menu.Item key="/algorithm"><Link to="/algorithm">算法演示</Link></Menu.Item>
-                            <Menu.Item key="/example"><Link to="/example">操作实例</Link></Menu.Item>
-                            <Menu.Item key="/languageFactory"><Link to="/languageFactory">语言工厂</Link></Menu.Item>
+                            <Menu.Item key="/colang"><Link to="/colang">Co语言</Link></Menu.Item>
                         </Menu>
                     </Header>
                     <Route path="/" exact component={ConceptTree}/>
                     <Route path="/concepts" component={ConceptTree}/>
                     <Route path="/algorithm" component={LeftRightLayout}/>
                     <Route path="/lex" component={LexPage}/>
+                    <Route path="/colang" component={CoLangPage}/>
                 </Layout>
             </Router>
         )
