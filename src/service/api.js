@@ -41,6 +41,10 @@ class api {
         return request('POST', '/syntax/parsingProcessingOutput', data)
     }
 
+    static parsingSyntaxActionOutput(data) {
+        return request('POST', '/syntax/parsingActionOutput', data)
+    }
+
     static parsingLL1Output(data) {
         return new Promise(((resolve, reject) => {
             let body = ''

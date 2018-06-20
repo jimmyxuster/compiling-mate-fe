@@ -2,7 +2,7 @@
   "algorithm": [
     {"name": "LL(1)", "to": "/algorithm/ll1"},
     {"name": "SLR", "to": "/algorithm/slr"},
-    {"name": "LALR", "to": "/algorithm/lr"},
+    {"name": "LR(1)", "to": "/algorithm/lr"},
     {"name": "LEX", "to": "/algorithm/lex"}
   ]
 }
