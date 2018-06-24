@@ -1,0 +1,154 @@
+{
+  "prodRules": [
+    {
+      "prodLeft": "E",
+      "prodRight": "id",
+      "rules": [
+        "E.type=lookup(id.entry)"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "charliteral",
+      "rules": [
+        "E.type=char"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "intliteral",
+      "rules": [
+        "E.type=int"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "realliteral",
+      "rules": [
+        "E.type=real"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "E1 + E2",
+      "rules": [
+        "if (E1.type=int and E2.type=int) then E.type=int",
+        " else if (E1.type=int and E2.type=real) then E.type=real",
+        " else if (E1.type=real and E2.type=int) then E.type=real",
+        " else if (E1.type=real and E2.type=real) then E.type=real",
+        " else E.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "E1[E2]",
+      "rules": [
+        "if (E2.type=int and E1.type=array(s,t)) then E.type=t",
+        " else E.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "E",
+      "prodRight": "↑E1",
+      "rules": [
+        "if (t=pointer(E1.type)) then E.type=t",
+        " else E.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "S",
+      "prodRight": "id = E",
+      "rules": [
+        "if (id.type=E.type) then S.type=void",
+        " else S.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "S",
+      "prodRight": "if E then S1",
+      "rules": [
+        "if (E.type=boolean ) then S.type=S1.type",
+        " else S.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "S",
+      "prodRight": "while E do S1",
+      "rules": [
+        "if (E.type=boolean) then S.type=S1.type",
+        " else S.type=type_error"
+      ]
+    },
+    {
+      "prodLeft": "S",
+      "prodRight": "S1; S2",
+      "rules": [
+        "if (S1.type=void and S2.type=void) then S.type=void",
+        " else S.type=type_error"
+      ]
+    }
+  ],
+  "input": "if t then x=3",
+  "tableSource": [
+    {
+      "Stack": "-",
+      "Input": "if t then x=3",
+      "Semantic Rules to Action": "-",
+      "key": "1"
+    },
+    {
+      "Stack": "if",
+      "Input": "t then x=3",
+      "Semantic Rules to Action": "-",
+      "key": "2"
+    },
+    {
+      "Stack": "if t",
+      "Input": "then x=3",
+      "Semantic Rules to Action": "-",
+      "key": "3"
+    },
+    {
+      "Stack": "if E",
+      "Input": "then x=3",
+      "Semantic Rules to Action": "E.type = lookup(t)",
+      "key": "4"
+    },
+    {
+      "Stack": "if E then ",
+      "Input": "x=3",
+      "Semantic Rules to Action": "-",
+      "key": "5"
+    },
+    {
+      "Stack": "if E then x",
+      "Input": "=3",
+      "Semantic Rules to Action": "-",
+      "key": "6"
+    },
+    {
+      "Stack": "if E then x=",
+      "Input": "3",
+      "Semantic Rules to Action": "-",
+      "key": "7"
+    },
+    {
+      "Stack": "if E then x=3",
+      "Input": "-",
+      "Semantic Rules to Action": "-",
+      "key": "8"
+    },
+    {
+      "Stack": "if E then S",
+      "Input": "-",
+      "Semantic Rules to Action": "if id.type=E.type then S.type=void else S.type=type_error",
+      "key": "9"
+    },
+    {
+      "Stack": "S",
+      "Input": "-",
+      "Semantic Rules to Action": "if E.type=boolean then S.type=S1.type else S.type=type_error",
+      "key": "10"
+    }
+  ]
+}
