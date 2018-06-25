@@ -288,7 +288,7 @@ class SLR extends React.Component {
                      rowClassName={(record, index) => index <= this.state.actionOutputStep ? 'action-output' : 'action-output inactive'}
                      onRow={(record, index) => {
                          return {
-                             onClick: () => {console.log(index);this.setState({actionOutputStep: index})},       // 点击行
+                             onClick: () => {this.setState({actionOutputStep: index})},       // 点击行
                          };
                      }}>
                   <Column title="栈" dataIndex="stack"/>

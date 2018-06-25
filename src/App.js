@@ -8,6 +8,7 @@ import LexPage from './component/LexPage/LexPage';
 import CoLangPage from './component/CoLang/CoLangPage';
 import AboutPage from './component/AboutPage/AboutPage';
 import Logo from './img/logo.jpg';
+import Semantic from './component/semantic/Semantic'
 const {Header} = Layout
 
 class App extends Component {
@@ -42,6 +43,7 @@ class App extends Component {
                         >
                             <Menu.Item key="/concepts"><Link to="/concepts">知识图谱</Link></Menu.Item>
                             <Menu.Item key="/algorithm"><Link to="/algorithm">算法演示</Link></Menu.Item>
+                            <Menu.Item key="/type-checking"><Link to="/type-checking">类型检查</Link></Menu.Item>
                             <Menu.Item key="/colang"><Link to="/colang">Co语言</Link></Menu.Item>
                             <Menu.Item key="/about"><Link to="/about">关于</Link></Menu.Item>
                         </Menu>
@@ -50,6 +52,7 @@ class App extends Component {
                     <Route path="/concepts" component={ConceptTree}/>
                     <Route path="/algorithm" component={LeftRightLayout}/>
                     <Route path="/lex" component={LexPage}/>
+                    <Route path="/type-checking" component={Semantic}/>
                     <Route path="/colang" component={CoLangPage}/>
                     <Route path="/about" component={AboutPage}/>
                 </Layout>
