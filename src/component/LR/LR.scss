@@ -1,21 +1,6 @@
 $node-width: 60px;
 .slr {
   height: 100%;
-  .slr-parse__input {
-    display: block;
-    width: 500px;
-    margin: 100px auto 30px;
-  }
-  .action-output {
-    cursor: pointer;
-    td {
-      background: #fff !important;
-      transition: none;
-    }
-    &.inactive {
-      color: #aaa;
-    }
-  }
   .slr__col {
     height: 100%;
   }

@@ -2,12 +2,12 @@ import React from 'react';
 import * as THREE from '../../common/three';
 import {Icon, Button} from 'antd';
 import classNames from 'classnames';
-import TWEEN from '@tweenjs/tween.js';
 import './ConceptTree.css';
 import { Spin } from 'antd';
 import ECharts from 'echarts';
 import mainGraph from './main';
 import lexGraph from './lex';
+import syntaxGraph from './syntax';
 import sematicGraph from './semantic';
 import descriptions from './description';
 
@@ -28,6 +28,7 @@ class ConceptTree extends React.Component {
         this.descChartData = {
             lex: lexGraph,
             semantic: sematicGraph,
+            syntax: syntaxGraph,
         }
         this.option = {
             title: {
@@ -180,6 +181,8 @@ class ConceptTree extends React.Component {
                 description: descriptions[params.data.value] || 'no description',
                 showDescription: true,
             });
+        } else if (params.data.link) {
+            this.props.history.push(params.data.link);
         }
     }
 

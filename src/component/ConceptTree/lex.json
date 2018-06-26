@@ -20,6 +20,7 @@
     {
       "source": "Regular Expression",
       "target": "DFA",
+      "link": "/algorithm/lex",
       "label": {
         "normal": {
           "show": true,
@@ -31,6 +32,7 @@
     {
       "source": "Regular Expression",
       "target": "NFA",
+      "link": "/algorithm/lex",
       "label": {
         "normal": {
           "show": true,
@@ -42,6 +44,7 @@
     {
       "source": "NFA",
       "target": "DFA",
+      "link": "/algorithm/lex",
       "label": {
         "normal": {
           "show": true,

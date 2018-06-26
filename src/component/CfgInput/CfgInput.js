@@ -43,6 +43,14 @@ class CfgInput extends React.Component {
         });
     }
 
+    inputEpsilon = (ev) => {
+        const {setFieldsValue, getFieldValue} = this.props.form;
+        if (ev.target.id && ev.key.toLowerCase() === 'alt') {
+            const oldVal = getFieldValue(ev.target.id);
+            setFieldsValue({[ev.target.id]: (oldVal || '') + 'ε'})
+        }
+    }
+
     render() {
         const { getFieldDecorator, getFieldValue } = this.props.form;
         getFieldDecorator('cfg', {initialValue: [cfgId]})
@@ -73,7 +81,7 @@ class CfgInput extends React.Component {
                               message: '请输入产生式',
                           }],
                       })(
-                          <Input placeholder=""/>
+                          <Input placeholder="" id={`cfgs[${index}].left`} onKeyDown={this.inputEpsilon}/>
                       )}
                   </FormItem>
               </Col>
@@ -90,7 +98,7 @@ class CfgInput extends React.Component {
                               message: '请输入产生式',
                           }],
                       })(
-                          <Input placeholder=""/>
+                          <Input placeholder="" id={`cfgs[${index}].right`} onKeyDown={this.inputEpsilon}/>
                       )}
                   </FormItem>
               </Col>
@@ -104,7 +112,7 @@ class CfgInput extends React.Component {
         return (
             <Form onSubmit={this.handleSubmit}>
                 <FormItem {...formItemLayoutFullLength}>
-                    <Alert message="请使用空格将文法符号分开" type="info" style={{width: '91.67%'}} showIcon />
+                    <Alert message="请使用空格将文法符号分开，按下alt键输入ε" type="info" style={{width: '91.67%'}} showIcon />
                 </FormItem>
                 <FormItem {...formstartSymbolLayout} label="开始符号">
                     {getFieldDecorator('startSymbol', {

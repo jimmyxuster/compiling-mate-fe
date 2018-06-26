@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "name": "CFG",
+      "x": 200,
+      "y": 0,
+      "symbolSize": 50
+    },
+    {
+      "name": "语法分析器",
+      "x": 200,
+      "y": 150,
+      "symbol": "circle",
+      "symbolSize": 170,
+      "itemStyle": {
+        "color": "#f55c53"
+      }
+    },
+    {
+      "name": "a",
+      "x": 0,
+      "y": 150,
+      "label": {
+        "show": false
+      }
+    },
+    {
+      "name": "b",
+      "x": 400,
+      "y": 150,
+      "label": {
+        "show": false
+      }
+    }
+  ],
+  "links": [
+    {
+      "source": "CFG",
+      "target": "语法分析器"
+    },
+    {
+      "source": "a",
+      "target": "语法分析器",
+      "label": {
+        "normal": {
+          "show": true,
+          "formatter": "词法：token",
+          "fontSize": 16
+        }
+      }
+    },
+    {
+      "source": "语法分析器",
+      "target": "b",
+      "label": {
+        "normal": {
+          "show": true,
+          "formatter": "Parse Tree",
+          "fontSize": 16
+        }
+      }
+    }
+  ]
+}

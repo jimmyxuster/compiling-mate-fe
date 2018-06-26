@@ -1,3 +1,18 @@
 .colang-page-container {
-    margin: 12px;
+    margin: 0px;
+    background-color: #282a36;
+    height: 100%;
+    #colang_editor {
+        height: 80%;
+    }
+    .card {
+        margin: 12px;
+    }
+    .info {
+        height: 100%;
+        overflow-y: auto;
+    }
+    #syntax_tree {
+        height: 300px;
+    }
 }

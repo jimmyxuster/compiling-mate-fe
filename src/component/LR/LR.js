@@ -4,13 +4,13 @@ import NodeChart from '../NodeChart/NodeChart'
 import CfgInput from '../CfgInput/CfgInput'
 import api from '../../service/api'
 import {calcNodePositions, parseNodeStates} from '../../common/util'
-import './SLR.css'
+import './LR.css'
 
 const {Column, ColumnGroup} = Table;
 const {Step} = Steps;
 const {Search} = Input;
 
-class SLR extends React.Component {
+class LR extends React.Component {
 
     constructor(props) {
         super(props)
@@ -46,7 +46,7 @@ class SLR extends React.Component {
         }
         const data = {
             ...this.processingOutputData,
-            type: 0,
+            type: 1,
         }
         api.parsingSyntaxProcessingOutput(data).then(res => {
             if (res.success) {
@@ -181,6 +181,7 @@ class SLR extends React.Component {
         this.fetchSolution(submitObj.cfgs, submitObj.startSymbol);
     }
 
+
     handleActionOutput = (input) => {
         Object.assign(this.processingOutputData, {input})
         api.parsingSyntaxActionOutput(this.processingOutputData).then(res => {
@@ -195,11 +196,11 @@ class SLR extends React.Component {
 
     parseActionOutputData = (actionResult) => {
         const actionOutput = actionResult.map((actionLine, index) => ({
-          stack: actionLine[0],
-          input: actionLine[1],
-          step: actionLine[2],
-          reference: actionLine[3],
-          key: `step${index}`,
+            stack: actionLine[0],
+            input: actionLine[1],
+            step: actionLine[2],
+            reference: actionLine[3],
+            key: `step${index}`,
         }));
         this.setState({actionOutput});
     }
@@ -282,21 +283,21 @@ class SLR extends React.Component {
             </Row>
         );
         const step3 = (
-          <div>
-              <Search className="slr-parse__input" enterButton="解析" onSearch={this.handleActionOutput} placeholder="输入句子，空格分隔终结符"/>
-              <Table dataSource={this.state.actionOutput} defaultExpandAllRows={true} pagination={false} bordered
-                     rowClassName={(record, index) => index <= this.state.actionOutputStep ? 'action-output' : 'action-output inactive'}
-                     onRow={(record, index) => {
-                         return {
-                             onClick: () => {this.setState({actionOutputStep: index})},       // 点击行
-                         };
-                     }}>
-                  <Column title="栈" dataIndex="stack"/>
-                  <Column title="输入" dataIndex="input"/>
-                  <Column title="操作" dataIndex="step"/>
-                  <Column title="依据" dataIndex="reference"/>
-              </Table>
-          </div>
+            <div>
+                <Search className="slr-parse__input" enterButton="解析" onSearch={this.handleActionOutput} placeholder="输入句子，空格分隔终结符"/>
+                <Table dataSource={this.state.actionOutput} defaultExpandAllRows={true} pagination={false} bordered
+                       rowClassName={(record, index) => index <= this.state.actionOutputStep ? 'action-output' : 'action-output inactive'}
+                       onRow={(record, index) => {
+                           return {
+                               onClick: () => {console.log(index);this.setState({actionOutputStep: index})},       // 点击行
+                           };
+                       }}>
+                    <Column title="栈" dataIndex="stack"/>
+                    <Column title="输入" dataIndex="input"/>
+                    <Column title="操作" dataIndex="step"/>
+                    <Column title="依据" dataIndex="reference"/>
+                </Table>
+            </div>
         );
         return (
             <div className="slr">
@@ -311,21 +312,21 @@ class SLR extends React.Component {
                     <Step key="parse" title="解析"/>
                 </Steps>
                 {   (() => {
-                        switch (this.state.currentStep) {
-                            case 0:
-                                return step1;
-                            case 1:
-                                return step2;
-                            case 2:
-                                return step3;
-                            default:
-                                return null;
-                        }
-                    })()
+                    switch (this.state.currentStep) {
+                        case 0:
+                            return step1;
+                        case 1:
+                            return step2;
+                        case 2:
+                            return step3;
+                        default:
+                            return null;
+                    }
+                })()
                 }
             </div>
         )
     }
 }
 
-export default SLR
+export default LR
